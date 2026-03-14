@@ -1,14 +1,17 @@
 /**
  * ReservationsPage.tsx - List of current user's reservations
  *
- * Uses getSessionUser() to get the logged-in user, then filters reservations by userId.
- * Data comes from localStorage via getReservations(). If not logged in, shows a message.
+ * Uses Fake API (fetchReservations, updateReservationStatus): loading → success/error.
+ * Cancel flow: Modal confirmation → API call → toast.
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import StateMessage from '../components/ui/StateMessage'
-import { getReservations } from '../services/storage'
+import Button from '../components/ui/Button'
+import Modal from '../components/ui/Modal'
+import { fetchReservations, updateReservationStatus } from '../api/fakeApi'
 import { getSessionUser } from '../utils/auth'
+import { useToast } from '../contexts/ToastContext'
 import type { Reservation } from '../types'
 
 function getStatusColor(status: string) {
@@ -20,19 +23,82 @@ function getStatusColor(status: string) {
 
 export default function ReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [cancelTarget, setCancelTarget] = useState<Reservation | null>(null)
+  const [cancelling, setCancelling] = useState(false)
   const navigate = useNavigate()
   const user = getSessionUser()
+  const toast = useToast()
+
+  const loadReservations = useCallback(async () => {
+    const uid = user?.id
+    if (!uid) return
+    setLoading(true)
+    setError(null)
+    const result = await fetchReservations()
+    if (result.error) {
+      setError(result.error)
+      setReservations([])
+    } else {
+      const mine = (result.data ?? []).filter((r) => r.userId === uid)
+      setReservations(mine)
+    }
+    setLoading(false)
+  }, [user?.id])
 
   useEffect(() => {
-    const all = getReservations()
-    const mine = user ? all.filter((r) => r.userId === user.id) : []
-    setReservations(mine)
-  }, [user?.id])
+    void loadReservations()
+  }, [loadReservations])
+
+  async function handleConfirmCancel() {
+    if (!cancelTarget) return
+    setCancelling(true)
+    const result = await updateReservationStatus(cancelTarget.id, 'Cancelled')
+    setCancelling(false)
+    setCancelTarget(null)
+    if (result.error) {
+      toast.showToast(result.error, 'error')
+    } else {
+      toast.showToast('Reservation cancelled.', 'info')
+      void loadReservations()
+    }
+  }
+
+  const canCancel = (r: Reservation) => r.status === 'Pending' || r.status === 'Approved'
 
   if (!user) {
     return (
       <main className="mx-auto max-w-4xl px-6 py-6">
-        <StateMessage type="error" title="Not logged in" description="Log in to see your reservations." actionText="Log in" onAction={() => navigate('/login')} />
+        <StateMessage
+          type="error"
+          title="Not logged in"
+          description="Log in to see your reservations."
+          actionText="Log in"
+          onAction={() => navigate('/login')}
+        />
+      </main>
+    )
+  }
+
+  if (loading) {
+    return (
+      <main className="mx-auto max-w-4xl px-6 py-6">
+        <StateMessage type="loading" title="Loading..." description="Fetching your reservations." />
+      </main>
+    )
+  }
+
+  if (error) {
+    return (
+      <main className="mx-auto max-w-4xl px-6 py-6">
+        <StateMessage
+          type="error"
+          title="Failed to load"
+          description={error}
+          actionText="Try again"
+          onAction={() => loadReservations()}
+        />
       </main>
     )
   }
@@ -64,6 +130,7 @@ export default function ReservationsPage() {
               <th className="px-4 py-3 text-left font-semibold text-[#ddd]">Time</th>
               <th className="px-4 py-3 text-left font-semibold text-[#ddd]">Purpose</th>
               <th className="px-4 py-3 text-left font-semibold text-[#ddd]">Status</th>
+              <th className="px-4 py-3 text-left font-semibold text-[#ddd]">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -74,11 +141,44 @@ export default function ReservationsPage() {
                 <td className="px-4 py-3 text-[#bbb]">{r.startTime} - {r.endTime}</td>
                 <td className="px-4 py-3 text-[#bbb]">{r.purpose ?? '—'}</td>
                 <td className={`px-4 py-3 font-medium ${getStatusColor(r.status)}`}>{r.status}</td>
+                <td className="px-4 py-3">
+                  {canCancel(r) && (
+                    <Button
+                      variant="danger"
+                      onClick={() => setCancelTarget(r)}
+                      aria-label={`Cancel reservation for ${r.space}`}
+                    >
+                      Cancel
+                    </Button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <Modal
+        isOpen={!!cancelTarget}
+        onClose={() => !cancelling && setCancelTarget(null)}
+        title="Cancel reservation?"
+      >
+        {cancelTarget && (
+          <>
+            <p className="text-sm text-[#bbb]">
+              {cancelTarget.space} — {cancelTarget.date} {cancelTarget.startTime}–{cancelTarget.endTime}
+            </p>
+            <div className="mt-4 flex gap-2">
+              <Button variant="danger" onClick={handleConfirmCancel} disabled={cancelling}>
+                {cancelling ? 'Cancelling...' : 'Yes, cancel'}
+              </Button>
+              <Button variant="secondary" onClick={() => setCancelTarget(null)} disabled={cancelling}>
+                Keep reservation
+              </Button>
+            </div>
+          </>
+        )}
+      </Modal>
     </main>
   )
 }

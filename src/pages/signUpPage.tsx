@@ -1,8 +1,7 @@
 /**
  * SignUpPage.tsx - Registration form
  *
- * Creates a new user in localStorage. Validates: all fields required, passwords match,
- * password length, email not already registered. On success, saves session and redirects.
+ * Accessible: labels, focus-visible, autoComplete.
  */
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -11,6 +10,8 @@ import Button from '../components/ui/Button'
 import { SESSION_KEY } from '../utils/auth'
 import { getUsers, saveUsers } from '../services/storage'
 import type { User } from '../types'
+
+const inputBase = 'border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#555]'
 
 export default function SignUpPage() {
   const [name, setName] = useState('')
@@ -65,6 +66,8 @@ export default function SignUpPage() {
         name: newUser.name,
         email: newUser.email,
         role: newUser.role,
+        noShowCount: newUser.noShowCount,
+        blockedUntil: newUser.blockedUntil,
       },
     }
     localStorage.setItem(SESSION_KEY, JSON.stringify(session))
@@ -75,64 +78,79 @@ export default function SignUpPage() {
     <main className="mx-auto max-w-md px-6 py-10">
       <section className="border border-[#333] bg-[#222] p-6">
         <div className="flex items-center gap-2 text-[#ddd]">
-          <FiUserPlus className="text-[#888]" />
+          <FiUserPlus className="text-[#888]" aria-hidden />
           <h1 className="text-xl font-semibold">Sign Up</h1>
         </div>
         <p className="mt-2 text-sm text-[#888]">Create an account (stored in localStorage)</p>
 
         {!submitted && (
-          <form className="mt-4 flex flex-col gap-3" onSubmit={onSubmit}>
-            <label className="flex flex-col gap-2">
+          <form className="mt-4 flex flex-col gap-3" onSubmit={onSubmit} noValidate>
+            <label htmlFor="signup-name" className="flex flex-col gap-2">
               <span className="text-xs text-[#888]">Name</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                id="signup-name"
+                className={inputBase}
                 type="text"
                 placeholder="Your name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                autoComplete="name"
               />
             </label>
-            <label className="flex flex-col gap-2">
+            <label htmlFor="signup-email" className="flex flex-col gap-2">
               <span className="text-xs text-[#888]">Email</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                id="signup-email"
+                className={inputBase}
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                autoComplete="email"
               />
             </label>
-            <label className="flex flex-col gap-2">
+            <label htmlFor="signup-password" className="flex flex-col gap-2">
               <span className="text-xs text-[#888]">Password</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                id="signup-password"
+                className={inputBase}
                 type="password"
                 placeholder="••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={4}
+                autoComplete="new-password"
               />
             </label>
-            <label className="flex flex-col gap-2">
+            <label htmlFor="signup-confirm" className="flex flex-col gap-2">
               <span className="text-xs text-[#888]">Confirm password</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                id="signup-confirm"
+                className={inputBase}
                 type="password"
                 placeholder="••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                autoComplete="new-password"
               />
             </label>
-            {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
+            {error && (
+              <p className="text-sm text-red-400" role="alert">
+                {error}
+              </p>
+            )}
             <Button type="submit" variant="primary">
               Create account
             </Button>
             <p className="m-0 text-sm text-[#888]">
-              Already have an account? <Link className="text-[#aaa] hover:underline" to="/login">Log in</Link>
+              Already have an account?{' '}
+              <Link className="text-[#aaa] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#555] rounded" to="/login">
+                Log in
+              </Link>
             </p>
           </form>
         )}

@@ -1,9 +1,9 @@
 /**
  * auth.ts - Session helpers
  *
- * Session is stored in localStorage under SESSION_KEY.
- * getSessionUser() returns the logged-in user or null.
- * isLoggedIn() is a convenience check. logout() clears the session.
+ * Session stored in localStorage. getSessionUser() returns logged-in user or null.
+ * isBlocked(): user cannot create reservations until blockedUntil date.
+ * isAdmin(): role-based UI - show Approvals, Manage Spaces.
  */
 export const SESSION_KEY = 'salafinder_session'
 
@@ -12,6 +12,8 @@ export interface SessionUser {
   name: string
   email: string
   role: string
+  noShowCount?: number
+  blockedUntil?: string
 }
 
 export function getSessionUser(): SessionUser | null {
@@ -28,6 +30,16 @@ export function getSessionUser(): SessionUser | null {
 export function isLoggedIn(): boolean {
   const user = getSessionUser()
   return !!(user?.email)
+}
+
+export function isBlocked(): boolean {
+  const user = getSessionUser()
+  if (!user?.blockedUntil) return false
+  return new Date(user.blockedUntil) > new Date()
+}
+
+export function isAdmin(): boolean {
+  return getSessionUser()?.role === 'Admin'
 }
 
 export function logout(): void {

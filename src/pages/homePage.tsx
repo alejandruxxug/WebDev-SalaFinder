@@ -1,17 +1,15 @@
 /**
- * HomePage.tsx - Space listing with search
+ * HomePage.tsx - Space listing with filters
  *
- * Demonstrates:
- * - useState: holds spaces, loading, error, and search term
- * - useEffect: fetches spaces when the component mounts (runs once on load)
- * - useMemo: filters spaces only when spaces or searchTerm changes (avoids recalculating every render)
- * - Controlled input: searchTerm is React state; input value and onChange update it
+ * Uses Fake API (fetchSpaces): loading → success/error.
+ * FilterBar: search, type, only available.
  */
 import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SpaceList from '../components/spaces/SpaceList'
+import FilterBar from '../components/spaces/FilterBar'
 import StateMessage from '../components/ui/StateMessage'
-import { getSpaces } from '../services/spaceService'
+import { fetchSpaces } from '../api/fakeApi'
 import type { Space } from '../types'
 
 export default function HomePage() {
@@ -19,32 +17,44 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedType, setSelectedType] = useState<string>('ALL')
+  const [onlyAvailable, setOnlyAvailable] = useState(false)
 
   const navigate = useNavigate()
 
-  // Load spaces when component mounts. useEffect with [] runs once after first render.
   useEffect(() => {
     async function loadSpaces() {
-      try {
-        setLoading(true)
-        setError(null)
-        const data = await getSpaces()
-        setSpaces(data)
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Unknown error')
-      } finally {
-        setLoading(false)
+      setLoading(true)
+      setError(null)
+      const result = await fetchSpaces()
+      if (result.error) {
+        setError(result.error)
+        setSpaces([])
+      } else {
+        setSpaces(result.data ?? [])
       }
+      setLoading(false)
     }
     void loadSpaces()
   }, [])
 
-  // Filter spaces by search term. useMemo caches result until spaces or searchTerm changes.
+  const types = useMemo(() => Array.from(new Set(spaces.map((s) => s.type))).sort(), [spaces])
+
   const filteredSpaces = useMemo(() => {
     const term = searchTerm.trim().toLowerCase()
-    if (!term) return spaces
-    return spaces.filter((s) => s.name.toLowerCase().includes(term))
-  }, [spaces, searchTerm])
+    return spaces.filter((s) => {
+      const matchesSearch = !term || s.name.toLowerCase().includes(term)
+      const matchesType = selectedType === 'ALL' || s.type === selectedType
+      const matchesAvailability = !onlyAvailable || s.status === 'AVAILABLE'
+      return matchesSearch && matchesType && matchesAvailability
+    })
+  }, [spaces, searchTerm, selectedType, onlyAvailable])
+
+  function handleReset() {
+    setSearchTerm('')
+    setSelectedType('ALL')
+    setOnlyAvailable(false)
+  }
 
   function handleReserve(space: Space) {
     navigate(`/reservations/new?spaceId=${space.id}`)
@@ -57,18 +67,21 @@ export default function HomePage() {
       <h1 className="m-0 text-2xl font-semibold">Available Spaces</h1>
       <p className="mt-2 text-sm text-[#888]">Browse and reserve rooms, labs, and courts.</p>
 
-      {/* Simple search: controlled input bound to searchTerm state */}
-      <div className="mt-4 border border-[#333] bg-[#222] p-4">
-        <label className="flex flex-col gap-2">
-          <span className="text-xs text-[#888]">Search by name</span>
-          <input
-            className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
-            type="text"
-            placeholder="Type to filter..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </label>
+      <FilterBar
+        searchTerm={searchTerm}
+        onSearchTerm={setSearchTerm}
+        types={types}
+        selectedType={selectedType}
+        onSelectedType={setSelectedType}
+        onlyAvailable={onlyAvailable}
+        onSetOnlyAvailable={setOnlyAvailable}
+        onReset={handleReset}
+      />
+
+      <div className="mt-3 flex justify-end">
+        <span className="border border-[#333] bg-[#222] px-3 py-1 text-xs text-[#888]">
+          Results: {filteredSpaces.length}
+        </span>
       </div>
 
       <section className="mt-4">
@@ -86,9 +99,9 @@ export default function HomePage() {
           <StateMessage
             type="empty"
             title="No results"
-            description="Try a different search term."
-            actionText="Clear search"
-            onAction={() => setSearchTerm('')}
+            description="Try changing the filters or resetting them."
+            actionText="Reset filters"
+            onAction={handleReset}
           />
         ) : (
           <SpaceList spaces={filteredSpaces} onReserve={handleReserve} />

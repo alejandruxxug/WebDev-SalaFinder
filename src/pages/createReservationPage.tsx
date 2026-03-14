@@ -1,17 +1,22 @@
 /**
- * CreateReservationPage.tsx - Simple reservation form
+ * CreateReservationPage.tsx - Reservation form
  *
- * Reads spaceId from URL query (?spaceId=1). Form collects date, time, purpose, attendees.
- * On submit: validates, creates a new reservation in localStorage, redirects to /reservations.
- * All reservations are auto-approved (no approval workflow in this simplified version).
+ * Business rules:
+ * - No conflict with approved reservations (alternate scenario 1)
+ * - Blocked users cannot reserve (alternate scenario 2)
+ * - requiresApproval → status Pending, else Approved
+ * Uses Fake API: createReservation with loading/success/error.
+ * Accessible: labels, focus-visible, keyboard nav.
  */
 import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import Button from '../components/ui/Button'
 import StateMessage from '../components/ui/StateMessage'
 import { getSpaces } from '../services/storage'
-import { getReservations, saveReservations } from '../services/storage'
-import { getSessionUser } from '../utils/auth'
+import { createReservation } from '../api/fakeApi'
+import { hasConflict, getConflictingReservations } from '../services/conflictService'
+import { getSessionUser, isBlocked } from '../utils/auth'
+import { useToast } from '../contexts/ToastContext'
 import type { Space, Reservation } from '../types'
 
 function getTodayString(): string {
@@ -35,6 +40,8 @@ const TIME_SLOTS = [
   { start: '15:00', end: '16:00' },
 ]
 
+const inputBase = 'border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd] rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#555]'
+
 export default function CreateReservationPage() {
   const [searchParams] = useSearchParams()
   const spaceIdParam = searchParams.get('spaceId')
@@ -49,15 +56,15 @@ export default function CreateReservationPage() {
   const [error, setError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const navigate = useNavigate()
+  const toast = useToast()
 
-  // Load space from storage when spaceId changes
   useEffect(() => {
     if (!spaceId || !Number.isFinite(spaceId)) return
     const spaces = getSpaces()
-    const found = spaces.find((s) => s.id === spaceId)
-    setSpace(found ?? null)
+    setSpace(spaces.find((s) => s.id === spaceId) ?? null)
   }, [spaceId])
 
   function validate(): boolean {
@@ -73,16 +80,24 @@ export default function CreateReservationPage() {
       if (isNaN(n) || n < 1) errs.attendeeCount = 'Must be at least 1'
       else if (n > maxCapacity) errs.attendeeCount = `Max capacity: ${maxCapacity}`
     }
+    if (spaceId && startTime && endTime && date && hasConflict(spaceId, date, startTime, endTime)) {
+      errs.timeSlot = 'Time slot conflicts with an approved reservation'
+    }
     setFieldErrors(errs)
     return Object.keys(errs).length === 0
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     const user = getSessionUser()
     if (!user) {
       setError('Not logged in')
+      return
+    }
+    if (isBlocked()) {
+      setError('Your account is blocked. Contact admin.')
+      toast.showToast('Blocked users cannot create reservations.', 'error')
       return
     }
     if (!space) {
@@ -91,25 +106,34 @@ export default function CreateReservationPage() {
     }
     if (!validate()) return
 
-    const reservations = getReservations()
-    const nextId = reservations.length ? Math.max(...reservations.map((r) => r.id)) + 1 : 1
-
-    const newReservation: Reservation = {
-      id: nextId,
+    setSubmitting(true)
+    const status = space.requiresApproval ? 'Pending' : 'Approved'
+    const newReservation: Omit<Reservation, 'id'> = {
       spaceId: space.id,
       space: space.name,
       userId: user.id,
       date,
       startTime,
       endTime,
-      status: 'Approved',
+      status,
       purpose: purpose.trim(),
       attendeeCount: parseInt(attendeeCount, 10),
     }
-    reservations.push(newReservation)
-    saveReservations(reservations)
-    setSubmitted(true)
-    setTimeout(() => navigate('/reservations'), 1500)
+
+    const result = await createReservation(newReservation)
+    setSubmitting(false)
+
+    if (result.error) {
+      setError(result.error)
+      toast.showToast(result.error, 'error')
+    } else {
+      setSubmitted(true)
+      toast.showToast(
+        status === 'Pending' ? 'Reservation created. Awaiting approval.' : 'Reservation created and approved.',
+        'success'
+      )
+      setTimeout(() => navigate('/reservations'), 1500)
+    }
   }
 
   if (!spaceId || !Number.isFinite(spaceId)) {
@@ -134,17 +158,35 @@ export default function CreateReservationPage() {
     )
   }
 
+  if (isBlocked()) {
+    return (
+      <main className="mx-auto max-w-md px-6 py-10">
+        <StateMessage
+          type="error"
+          title="Account blocked"
+          description="You cannot make reservations. Contact admin."
+          actionText="Go back"
+          onAction={() => navigate('/')}
+        />
+      </main>
+    )
+  }
+
   if (submitted) {
     return (
       <main className="mx-auto max-w-md px-6 py-10">
         <StateMessage
           type="empty"
           title="Reservation created!"
-          description="Your reservation has been saved."
+          description={space.requiresApproval ? 'Awaiting approval.' : 'Approved automatically.'}
         />
       </main>
     )
   }
+
+  const conflicts = startTime && endTime && date
+    ? getConflictingReservations(spaceId, date, startTime, endTime)
+    : []
 
   return (
     <main className="mx-auto max-w-md px-6 py-10">
@@ -152,26 +194,35 @@ export default function CreateReservationPage() {
         <h1 className="text-xl font-semibold text-[#ddd]">Create Reservation</h1>
         <p className="mt-2 text-sm text-[#888]">
           <strong>{space.name}</strong> ({space.type}) — Capacity: {space.capacity}
+          {space.requiresApproval && ' — Requires approval'}
         </p>
 
-        <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
-          <label className="flex flex-col gap-2">
+        <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4" noValidate>
+          <label htmlFor="res-date" className="flex flex-col gap-2">
             <span className="text-xs text-[#888]">Date</span>
             <input
-              className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+              id="res-date"
+              className={inputBase}
               type="date"
               min={getTodayString()}
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
+              aria-invalid={!!fieldErrors.date}
+              aria-describedby={fieldErrors.date ? 'res-date-error' : undefined}
             />
-            {fieldErrors.date && <span className="text-xs text-red-400">{fieldErrors.date}</span>}
+            {fieldErrors.date && (
+              <span id="res-date-error" className="text-xs text-red-400" role="alert">
+                {fieldErrors.date}
+              </span>
+            )}
           </label>
 
-          <label className="flex flex-col gap-2">
+          <label htmlFor="res-time" className="flex flex-col gap-2">
             <span className="text-xs text-[#888]">Time slot</span>
             <select
-              className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+              id="res-time"
+              className={inputBase}
               value={startTime ? `${startTime}-${endTime}` : ''}
               onChange={(e) => {
                 const v = e.target.value
@@ -185,6 +236,8 @@ export default function CreateReservationPage() {
                 }
               }}
               required
+              aria-invalid={!!fieldErrors.timeSlot}
+              aria-describedby={fieldErrors.timeSlot || conflicts.length ? 'res-time-error' : undefined}
             >
               <option value="">Select...</option>
               {TIME_SLOTS.map((t) => (
@@ -193,41 +246,62 @@ export default function CreateReservationPage() {
                 </option>
               ))}
             </select>
-            {fieldErrors.timeSlot && <span className="text-xs text-red-400">{fieldErrors.timeSlot}</span>}
+            {fieldErrors.timeSlot && (
+              <span id="res-time-error" className="text-xs text-red-400" role="alert">
+                {fieldErrors.timeSlot}
+              </span>
+            )}
+            {conflicts.length > 0 && !fieldErrors.timeSlot && (
+              <span className="text-xs text-amber-400">
+                Conflicts with: {conflicts.map((c) => `${c.space} ${c.date} ${c.startTime}-${c.endTime}`).join(', ')}
+              </span>
+            )}
           </label>
 
-          <label className="flex flex-col gap-2">
+          <label htmlFor="res-purpose" className="flex flex-col gap-2">
             <span className="text-xs text-[#888]">Purpose</span>
             <input
-              className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+              id="res-purpose"
+              className={inputBase}
               type="text"
               placeholder="e.g. Team meeting"
               value={purpose}
               onChange={(e) => setPurpose(e.target.value)}
               required
+              aria-invalid={!!fieldErrors.purpose}
             />
-            {fieldErrors.purpose && <span className="text-xs text-red-400">{fieldErrors.purpose}</span>}
+            {fieldErrors.purpose && (
+              <span className="text-xs text-red-400" role="alert">{fieldErrors.purpose}</span>
+            )}
           </label>
 
-          <label className="flex flex-col gap-2">
+          <label htmlFor="res-attendees" className="flex flex-col gap-2">
             <span className="text-xs text-[#888]">Attendees (1–{space.capacity})</span>
             <input
-              className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+              id="res-attendees"
+              className={inputBase}
               type="number"
               min={1}
               max={space.capacity}
               value={attendeeCount}
               onChange={(e) => setAttendeeCount(e.target.value)}
               required
+              aria-invalid={!!fieldErrors.attendeeCount}
             />
-            {fieldErrors.attendeeCount && <span className="text-xs text-red-400">{fieldErrors.attendeeCount}</span>}
+            {fieldErrors.attendeeCount && (
+              <span className="text-xs text-red-400" role="alert">{fieldErrors.attendeeCount}</span>
+            )}
           </label>
 
-          {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
+          {error && (
+            <p className="text-sm text-red-400" role="alert">
+              {error}
+            </p>
+          )}
 
           <div className="flex gap-2">
-            <Button type="submit" variant="primary">
-              Create reservation
+            <Button type="submit" variant="primary" disabled={submitting}>
+              {submitting ? 'Creating...' : 'Create reservation'}
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate('/')}>
               Cancel

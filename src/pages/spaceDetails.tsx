@@ -1,8 +1,7 @@
 /**
  * SpaceDetails.tsx - Single space view
  *
- * Uses useParams() to get the :id from the URL (e.g. /spaces/3 → id = "3").
- * Fetches the space by ID and displays its details. Shows loading/error states.
+ * Uses Fake API (fetchSpaceById): loading → success/error.
  */
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -11,7 +10,7 @@ import { FiCalendar } from 'react-icons/fi'
 import StateMessage from '../components/ui/StateMessage'
 import Button from '../components/ui/Button'
 import Badge from '../components/ui/Badge'
-import { getSpaceById } from '../services/spaceService'
+import { fetchSpaceById } from '../api/fakeApi'
 import type { Space } from '../types'
 
 export default function SpaceDetails() {
@@ -29,18 +28,17 @@ export default function SpaceDetails() {
       setLoading(false)
       return
     }
-
     async function loadSpace() {
-      try {
-        setLoading(true)
-        setError(null)
-        const data = await getSpaceById(spaceId)
-        setSpace(data)
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Unknown error')
-      } finally {
-        setLoading(false)
+      setLoading(true)
+      setError(null)
+      const result = await fetchSpaceById(spaceId)
+      if (result.error) {
+        setError(result.error)
+        setSpace(null)
+      } else {
+        setSpace(result.data ?? null)
       }
+      setLoading(false)
     }
     void loadSpace()
   }, [spaceId])
@@ -71,8 +69,11 @@ export default function SpaceDetails() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-6">
-      <Link to="/" className="inline-flex items-center gap-2 text-sm text-[#aaa] hover:underline">
-        <SlArrowLeftCircle />
+      <Link
+        to="/"
+        className="inline-flex items-center gap-2 text-sm text-[#aaa] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#555] rounded"
+      >
+        <SlArrowLeftCircle aria-hidden />
         Back to spaces
       </Link>
 
@@ -93,6 +94,9 @@ export default function SpaceDetails() {
           {space.resources.length > 0 && (
             <p><span className="font-semibold">Resources:</span> {space.resources.join(', ')}</p>
           )}
+          {space.requiresApproval && (
+            <p className="text-amber-400">Requires admin approval</p>
+          )}
         </div>
 
         <div className="mt-6">
@@ -101,7 +105,7 @@ export default function SpaceDetails() {
             disabled={isUnavailable}
             onClick={() => navigate(`/reservations/new?spaceId=${space.id}`)}
           >
-            <FiCalendar />
+            <FiCalendar aria-hidden />
             {isUnavailable ? 'Unavailable' : 'Reserve this space'}
           </Button>
         </div>
