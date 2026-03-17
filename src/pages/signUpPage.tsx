@@ -95,7 +95,7 @@ export default function SignUpPage() {
               <input
                 className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="you@eia.edu.co"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
