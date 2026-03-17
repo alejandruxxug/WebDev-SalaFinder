@@ -75,7 +75,7 @@ export default function SignUpPage() {
           <FiUserPlus className="text-[#888]" />
           <h1 className="text-xl font-semibold">Sign Up</h1>
         </div>
-        <p className="mt-2 text-sm text-[#888]">Create an account (prototype: stored in localStorage)</p>
+        <p className="mt-2 text-sm text-[#888]">Create an account!</p>
 
         {!submitted && (
           <form className="mt-4 flex flex-col gap-3" onSubmit={onSubmit}>
