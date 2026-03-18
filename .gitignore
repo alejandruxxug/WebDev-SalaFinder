@@ -1,5 +1,6 @@
 # Logs
 CLAUDE.MD
+workflows.md
 logs
 *.log
 npm-debug.log*
