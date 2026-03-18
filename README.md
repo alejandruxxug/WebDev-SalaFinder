@@ -138,4 +138,8 @@ localStorage.removeItem('salafinder_auditLogs')
 
 ## License
 
+Sebastían Higuita Usme
+Alejandro Urrego Giraldo
+
+Web Enginnering FrontEnd Class
 Private project.
