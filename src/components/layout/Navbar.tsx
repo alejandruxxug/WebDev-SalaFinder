@@ -1,6 +1,6 @@
 // top nav with links, shows Log out when logged in
 import { NavLink, useNavigate } from 'react-router-dom'
-import { FiCalendar, FiLogIn, FiUserPlus, FiList, FiLogOut, FiCheckCircle } from 'react-icons/fi'
+import { FiLogIn, FiUserPlus, FiList, FiLogOut, FiCheckCircle } from 'react-icons/fi'
 import { isLoggedIn, logout, isAdmin } from '../../utils/auth'
 
 const linkBase = 'text-sm text-blue-200 hover:text-white hover:bg-[#002470] px-3 py-1.5 rounded transition-colors'
@@ -19,9 +19,7 @@ export default function Navbar() {
     <header className="bg-[#003087] shadow-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <NavLink to="/" className="flex items-center gap-2.5 text-white">
-          <div className="flex h-8 w-8 items-center justify-center rounded bg-white/20">
-            <FiCalendar className="text-white" size={16} />
-          </div>
+          <img src="/salaFinderLogo-200.png" alt="SalaFinder" className="h-9 w-9 rounded object-contain" />
           <div className="leading-tight">
             <p className="m-0 text-[10px] font-medium uppercase tracking-widest text-blue-200">EIA University</p>
             <h2 className="m-0 text-base font-bold text-white">SalaFinder</h2>
