@@ -7,7 +7,7 @@ export default function BlockedBanner() {
   const until = user?.blockedUntil ?? ''
 
   return (
-    <div className="border-b border-amber-600 bg-amber-900/30 px-6 py-3 text-center text-amber-200">
+    <div className="border-b border-amber-400 bg-amber-50 px-6 py-3 text-center text-amber-800 text-sm">
       Your account is blocked until {until}. You cannot make new reservations. Contact admin.
     </div>
   )

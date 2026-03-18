@@ -60,35 +60,37 @@ export default function ApprovalsPage() {
   if (reservations.length === 0) {
     return (
       <main className="mx-auto max-w-4xl px-6 py-6">
-        <h1 className="text-2xl font-semibold text-[#ddd]">Pending Approvals</h1>
-        <StateMessage type="empty" title="No pending approvals" description="All reservations are processed." />
+        <h1 className="text-2xl font-semibold text-slate-800">Pending Approvals</h1>
+        <div className="mt-6">
+          <StateMessage type="empty" title="No pending approvals" description="All reservations are processed." />
+        </div>
       </main>
     )
   }
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-6">
-      <h1 className="text-2xl font-semibold text-[#ddd]">Pending Approvals</h1>
-      <div className="mt-6 overflow-x-auto border border-[#333]">
+      <h1 className="text-2xl font-semibold text-slate-800">Pending Approvals</h1>
+      <div className="mt-6 overflow-x-auto border border-slate-200 rounded-md shadow-sm">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-[#333] bg-[#222]">
-              <th className="px-4 py-3 text-left font-semibold text-[#ddd]">Space</th>
-              <th className="px-4 py-3 text-left font-semibold text-[#ddd]">User</th>
-              <th className="px-4 py-3 text-left font-semibold text-[#ddd]">Date</th>
-              <th className="px-4 py-3 text-left font-semibold text-[#ddd]">Time</th>
-              <th className="px-4 py-3 text-left font-semibold text-[#ddd]">Purpose</th>
-              <th className="px-4 py-3 text-left font-semibold text-[#ddd]">Actions</th>
+            <tr className="border-b border-slate-200 bg-slate-50">
+              <th className="px-4 py-3 text-left font-semibold text-slate-600">Space</th>
+              <th className="px-4 py-3 text-left font-semibold text-slate-600">User</th>
+              <th className="px-4 py-3 text-left font-semibold text-slate-600">Date</th>
+              <th className="px-4 py-3 text-left font-semibold text-slate-600">Time</th>
+              <th className="px-4 py-3 text-left font-semibold text-slate-600">Purpose</th>
+              <th className="px-4 py-3 text-left font-semibold text-slate-600">Actions</th>
             </tr>
           </thead>
           <tbody>
             {reservations.map((r) => (
-              <tr key={r.id} className="border-b border-[#333]">
-                <td className="px-4 py-3 text-[#bbb]">{r.space}</td>
-                <td className="px-4 py-3 text-[#bbb]">{userName(r.userId)}</td>
-                <td className="px-4 py-3 text-[#bbb]">{r.date}</td>
-                <td className="px-4 py-3 text-[#bbb]">{r.startTime} - {r.endTime}</td>
-                <td className="px-4 py-3 text-[#bbb]">{r.purpose ?? '—'}</td>
+              <tr key={r.id} className="border-b border-slate-100 bg-white hover:bg-slate-50 transition-colors">
+                <td className="px-4 py-3 text-slate-700">{r.space}</td>
+                <td className="px-4 py-3 text-slate-700">{userName(r.userId)}</td>
+                <td className="px-4 py-3 text-slate-700">{r.date}</td>
+                <td className="px-4 py-3 text-slate-700">{r.startTime} - {r.endTime}</td>
+                <td className="px-4 py-3 text-slate-700">{r.purpose ?? '—'}</td>
                 <td className="px-4 py-3">
                   <div className="flex gap-2">
                     <Button variant="primary" onClick={() => handleApprove(r)}>Approve</Button>

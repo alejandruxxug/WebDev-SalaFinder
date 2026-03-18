@@ -65,8 +65,8 @@ export default function HomePage() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-6">
-      <h1 className="m-0 text-2xl font-semibold">Available Spaces</h1>
-      <p className="mt-2 text-sm text-[#888]">
+      <h1 className="m-0 text-2xl font-semibold text-slate-800">Available Spaces</h1>
+      <p className="mt-2 text-sm text-slate-500">
         Browse and reserve rooms, labs, and courts.
       </p>
 
@@ -82,7 +82,7 @@ export default function HomePage() {
       />
 
       <div className="mt-3 flex justify-end">
-        <span className="border border-[#333] bg-[#222] px-3 py-1 text-xs text-[#888]">
+        <span className="border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500 rounded">
           Results: {filteredSpaces.length}
         </span>
       </div>

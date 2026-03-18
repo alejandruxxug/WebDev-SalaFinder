@@ -24,17 +24,17 @@ export default function FilterBar({
   onSetOnlyAvailable,
   onReset,
 }: Props) {
-  const fieldBase = 'border border-[#444] bg-[#222] px-3 py-2 text-sm text-[#ddd]'
+  const fieldBase = 'border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 rounded'
 
   return (
-    <section className="mt-5 border border-[#333] bg-[#222] p-4">
+    <section className="mt-5 border border-slate-200 bg-white p-4 rounded-md shadow-sm">
       <div className="grid gap-3 lg:grid-cols-3">
         <label className="flex flex-col gap-2">
-          <span className="text-xs text-[#888]">Search</span>
+          <span className="text-xs font-medium text-slate-500">Search</span>
           <div className={`flex items-center gap-2 ${fieldBase}`}>
-            <FiSearch className="text-[#666]" />
+            <FiSearch className="text-slate-400" />
             <input
-              className="w-full bg-transparent outline-none placeholder:text-[#666]"
+              className="w-full bg-transparent outline-none placeholder:text-slate-400 text-slate-700"
               type="text"
               value={searchTerm}
               placeholder="Space name..."
@@ -44,7 +44,7 @@ export default function FilterBar({
         </label>
 
         <label className="flex flex-col gap-2">
-          <span className="text-xs text-[#888]">Type</span>
+          <span className="text-xs font-medium text-slate-500">Type</span>
           <select
             className={`cursor-pointer ${fieldBase}`}
             value={selectedType}
@@ -61,8 +61,13 @@ export default function FilterBar({
       </div>
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <label className="flex items-center gap-2 text-sm text-[#bbb]">
-          <input type="checkbox" checked={onlyAvailable} onChange={(e) => onSetOnlyAvailable(e.target.checked)} />
+        <label className="flex items-center gap-2 text-sm text-slate-600">
+          <input
+            type="checkbox"
+            checked={onlyAvailable}
+            onChange={(e) => onSetOnlyAvailable(e.target.checked)}
+            className="accent-[#003087]"
+          />
           Only available
         </label>
         <Button variant="secondary" onClick={onReset}>

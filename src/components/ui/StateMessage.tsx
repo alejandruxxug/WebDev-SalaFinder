@@ -14,18 +14,18 @@ export default function StateMessage({ title, type, description, actionText, onA
   const Icon = type === 'loading' ? FiLoader : type === 'error' ? FiAlertTriangle : FiInbox
   const ring =
     type === 'error'
-      ? 'border-red-800 text-red-400'
+      ? 'border-red-300 text-red-500'
       : type === 'loading'
-        ? 'border-[#444] text-[#888]'
-        : 'border-[#444] text-[#666]'
+        ? 'border-slate-300 text-slate-400'
+        : 'border-slate-300 text-slate-400'
 
   return (
-    <div className="border border-[#333] bg-[#222] p-6 text-center">
-      <div className={`mx-auto mb-3 flex h-10 w-10 items-center justify-center border ${ring}`}>
+    <div className="border border-slate-200 bg-white p-6 text-center rounded-md shadow-sm">
+      <div className={`mx-auto mb-3 flex h-10 w-10 items-center justify-center border rounded-full ${ring}`}>
         <Icon className={type === 'loading' ? 'animate-spin' : ''} />
       </div>
-      <h2 className="m-0 text-base font-semibold text-[#ddd]">{title}</h2>
-      {description && <p className="mt-2 text-sm text-[#888]">{description}</p>}
+      <h2 className="m-0 text-base font-semibold text-slate-700">{title}</h2>
+      {description && <p className="mt-2 text-sm text-slate-500">{description}</p>}
       {actionText && onAction && (
         <div className="mt-4 flex justify-center">
           <Button variant="secondary" onClick={onAction}>

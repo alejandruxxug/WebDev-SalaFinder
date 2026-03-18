@@ -66,30 +66,30 @@ export default function SpaceDetails() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-6">
-      <Link to="/" className="inline-flex items-center gap-2 text-sm text-[#aaa] hover:underline">
+      <Link to="/" className="inline-flex items-center gap-2 text-sm text-[#003087] hover:underline">
         <SlArrowLeftCircle />
         Back to spaces
       </Link>
 
-      <section className="mt-4 border border-[#333] bg-[#222] p-6">
+      <section className="mt-4 border border-slate-200 bg-white p-6 rounded-md shadow-sm">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="m-0 text-2xl font-semibold text-[#ddd]">{space.name}</h1>
-            <p className="mt-2 text-sm text-[#888]">{space.type}</p>
+            <h1 className="m-0 text-2xl font-semibold text-slate-800">{space.name}</h1>
+            <p className="mt-2 text-sm text-slate-500">{space.type}</p>
           </div>
           <Badge variant={isUnavailable ? 'danger' : 'success'}>
             {isUnavailable ? 'UNAVAILABLE' : 'AVAILABLE'}
           </Badge>
         </div>
 
-        <div className="mt-5 space-y-1 text-sm text-[#bbb]">
-          <p><span className="font-semibold">Capacity:</span> {space.capacity} people</p>
-          <p><span className="font-semibold">Building:</span> {space.building}</p>
+        <div className="mt-5 space-y-1.5 text-sm text-slate-600">
+          <p><span className="font-semibold text-slate-700">Capacity:</span> {space.capacity} people</p>
+          <p><span className="font-semibold text-slate-700">Building:</span> {space.building}</p>
           {space.resources.length > 0 && (
-            <p><span className="font-semibold">Resources:</span> {space.resources.join(', ')}</p>
+            <p><span className="font-semibold text-slate-700">Resources:</span> {space.resources.join(', ')}</p>
           )}
           {space.requiresApproval && (
-            <p className="text-amber-400">Requires admin approval</p>
+            <p className="text-amber-600 font-medium">Requires admin approval</p>
           )}
         </div>
 

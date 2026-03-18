@@ -174,32 +174,34 @@ export default function CreateReservationPage() {
     ? getConflictingReservations(spaceId, date, startTime, endTime)
     : []
 
+  const inputClass = 'border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]'
+
   return (
     <main className="mx-auto max-w-md px-6 py-10">
-      <section className="border border-[#333] bg-[#222] p-6">
-        <h1 className="text-xl font-semibold text-[#ddd]">Create Reservation</h1>
-        <p className="mt-2 text-sm text-[#888]">
-          <strong>{space.name}</strong> ({space.type}) — Capacity: {space.capacity}
+      <section className="border border-slate-200 bg-white p-6 rounded-md shadow-sm">
+        <h1 className="text-xl font-semibold text-slate-800">Create Reservation</h1>
+        <p className="mt-2 text-sm text-slate-500">
+          <strong className="text-slate-700">{space.name}</strong> ({space.type}) — Capacity: {space.capacity}
         </p>
 
         <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
           <label className="flex flex-col gap-2">
-            <span className="text-xs text-[#888]">Date</span>
+            <span className="text-xs font-medium text-slate-500">Date</span>
             <input
-              className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+              className={inputClass}
               type="date"
               min={getTodayString()}
               value={date}
               onChange={(e) => setDate(e.target.value)}
               required
             />
-            {fieldErrors.date && <span className="text-xs text-red-400">{fieldErrors.date}</span>}
+            {fieldErrors.date && <span className="text-xs text-red-600">{fieldErrors.date}</span>}
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-xs text-[#888]">Time slot</span>
+            <span className="text-xs font-medium text-slate-500">Time slot</span>
             <select
-              className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+              className={inputClass}
               value={startTime ? `${startTime}-${endTime}` : ''}
               onChange={(e) => {
                 const v = e.target.value
@@ -226,31 +228,31 @@ export default function CreateReservationPage() {
                 )
               })}
             </select>
-            {fieldErrors.timeSlot && <span className="text-xs text-red-400">{fieldErrors.timeSlot}</span>}
+            {fieldErrors.timeSlot && <span className="text-xs text-red-600">{fieldErrors.timeSlot}</span>}
             {conflicts.length > 0 && (
-              <span className="text-xs text-amber-400">
+              <span className="text-xs text-amber-600">
                 Already reserved: {conflicts.map((c) => `${c.date} ${c.startTime}-${c.endTime} (${c.status})`).join(', ')}
               </span>
             )}
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-xs text-[#888]">Purpose</span>
+            <span className="text-xs font-medium text-slate-500">Purpose</span>
             <input
-              className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+              className={inputClass}
               type="text"
               placeholder="e.g. Team meeting"
               value={purpose}
               onChange={(e) => setPurpose(e.target.value)}
               required
             />
-            {fieldErrors.purpose && <span className="text-xs text-red-400">{fieldErrors.purpose}</span>}
+            {fieldErrors.purpose && <span className="text-xs text-red-600">{fieldErrors.purpose}</span>}
           </label>
 
           <label className="flex flex-col gap-2">
-            <span className="text-xs text-[#888]">Attendees (1–{space.capacity})</span>
+            <span className="text-xs font-medium text-slate-500">Attendees (1–{space.capacity})</span>
             <input
-              className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+              className={inputClass}
               type="number"
               min={1}
               max={space.capacity}
@@ -258,10 +260,10 @@ export default function CreateReservationPage() {
               onChange={(e) => setAttendeeCount(e.target.value)}
               required
             />
-            {fieldErrors.attendeeCount && <span className="text-xs text-red-400">{fieldErrors.attendeeCount}</span>}
+            {fieldErrors.attendeeCount && <span className="text-xs text-red-600">{fieldErrors.attendeeCount}</span>}
           </label>
 
-          {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
+          {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
 
           <div className="flex gap-2">
             <Button type="submit" variant="primary" disabled={conflicts.length > 0}>

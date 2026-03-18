@@ -62,19 +62,23 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto max-w-md px-6 py-10">
-      <section className="border border-[#333] bg-[#222] p-6">
-        <div className="flex items-center gap-2 text-[#ddd]">
-          <FiLogIn className="text-[#888]" />
-          <h1 className="text-xl font-semibold">Log In</h1>
+      <div className="mb-6 text-center">
+        <p className="text-xs font-medium uppercase tracking-widest text-[#003087]">EIA University</p>
+        <h1 className="mt-1 text-2xl font-bold text-slate-800">SalaFinder</h1>
+      </div>
+      <section className="border border-slate-200 bg-white p-6 rounded-md shadow-sm">
+        <div className="flex items-center gap-2 text-slate-700">
+          <FiLogIn className="text-[#003087]" />
+          <h2 className="text-xl font-semibold">Log In</h2>
         </div>
-        <p className="mt-2 text-sm text-[#888]">Sign in with your @eia.edu.co email</p>
+        <p className="mt-2 text-sm text-slate-500">Sign in with your @eia.edu.co email</p>
 
         {!submitted && (
           <form className="mt-4 flex flex-col gap-3" onSubmit={onSubmit}>
             <label className="flex flex-col gap-2">
-              <span className="text-xs text-[#888]">Email</span>
+              <span className="text-xs font-medium text-slate-500">Email</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                className="border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]"
                 type="email"
                 placeholder="you@eia.edu.co"
                 value={email}
@@ -83,9 +87,9 @@ export default function LoginPage() {
               />
             </label>
             <label className="flex flex-col gap-2">
-              <span className="text-xs text-[#888]">Password</span>
+              <span className="text-xs font-medium text-slate-500">Password</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                className="border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]"
                 type="password"
                 placeholder="••••••"
                 value={password}
@@ -93,12 +97,13 @@ export default function LoginPage() {
                 required
               />
             </label>
-            {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
+            {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
             <Button type="submit" variant="primary">
-              Submit
+              <FiLogIn />
+              Sign in
             </Button>
-            <p className="m-0 text-sm text-[#888]">
-              Don&apos;t have an account? <Link className="text-[#aaa] hover:underline" to="/signup">Sign up</Link>
+            <p className="m-0 text-sm text-slate-500">
+              Don&apos;t have an account? <Link className="text-[#003087] hover:underline font-medium" to="/signup">Sign up</Link>
             </p>
           </form>
         )}

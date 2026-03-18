@@ -75,20 +75,26 @@ export default function SignUpPage() {
     navigate('/')
   }, [submitted, name, email, major, password, navigate])
 
+  const inputClass = 'border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]'
+
   return (
     <main className="mx-auto max-w-md px-6 py-10">
-      <section className="border border-[#333] bg-[#222] p-6">
-        <div className="flex items-center gap-2 text-[#ddd]">
-          <FiUserPlus className="text-[#888]" />
-          <h1 className="text-xl font-semibold">Sign Up</h1>
+      <div className="mb-6 text-center">
+        <p className="text-xs font-medium uppercase tracking-widest text-[#003087]">EIA University</p>
+        <h1 className="mt-1 text-2xl font-bold text-slate-800">SalaFinder</h1>
+      </div>
+      <section className="border border-slate-200 bg-white p-6 rounded-md shadow-sm">
+        <div className="flex items-center gap-2 text-slate-700">
+          <FiUserPlus className="text-[#003087]" />
+          <h2 className="text-xl font-semibold">Sign Up</h2>
         </div>
-        <p className="mt-2 text-sm text-[#888]">Create an account with your @eia.edu.co email</p>
+        <p className="mt-2 text-sm text-slate-500">Create an account with your @eia.edu.co email</p>
         {!submitted && (
           <form className="mt-4 flex flex-col gap-3" onSubmit={onSubmit}>
             <label className="flex flex-col gap-2">
-              <span className="text-xs text-[#888]">Name</span>
+              <span className="text-xs font-medium text-slate-500">Name</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                className={inputClass}
                 type="text"
                 placeholder="Your name"
                 value={name}
@@ -97,9 +103,9 @@ export default function SignUpPage() {
               />
             </label>
             <label className="flex flex-col gap-2">
-              <span className="text-xs text-[#888]">Email</span>
+              <span className="text-xs font-medium text-slate-500">Email</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                className={inputClass}
                 type="email"
                 placeholder="you@eia.edu.co"
                 value={email}
@@ -108,9 +114,9 @@ export default function SignUpPage() {
               />
             </label>
             <label className="flex flex-col gap-2">
-              <span className="text-xs text-[#888]">Major</span>
+              <span className="text-xs font-medium text-slate-500">Major</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                className={inputClass}
                 type="text"
                 placeholder="e.g. Computer Science, Electrical Engineering"
                 value={major}
@@ -119,9 +125,9 @@ export default function SignUpPage() {
               />
             </label>
             <label className="flex flex-col gap-2">
-              <span className="text-xs text-[#888]">Password</span>
+              <span className="text-xs font-medium text-slate-500">Password</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                className={inputClass}
                 type="password"
                 placeholder="••••••"
                 value={password}
@@ -131,9 +137,9 @@ export default function SignUpPage() {
               />
             </label>
             <label className="flex flex-col gap-2">
-              <span className="text-xs text-[#888]">Confirm password</span>
+              <span className="text-xs font-medium text-slate-500">Confirm password</span>
               <input
-                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                className={inputClass}
                 type="password"
                 placeholder="••••••"
                 value={confirmPassword}
@@ -141,12 +147,12 @@ export default function SignUpPage() {
                 required
               />
             </label>
-            {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
+            {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
             <Button type="submit" variant="primary">
               Create account
             </Button>
-            <p className="m-0 text-sm text-[#888]">
-              Already have an account? <Link className="text-[#aaa] hover:underline" to="/login">Log in</Link>
+            <p className="m-0 text-sm text-slate-500">
+              Already have an account? <Link className="text-[#003087] hover:underline font-medium" to="/login">Log in</Link>
             </p>
           </form>
         )}

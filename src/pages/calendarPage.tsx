@@ -66,15 +66,17 @@ export default function CalendarPage() {
     setBaseDate(d)
   }
 
+  const selectClass = 'border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-700 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]'
+
   return (
     <main className="mx-auto max-w-6xl px-6 py-6">
-      <h1 className="text-2xl font-semibold text-[#ddd]">Week Calendar</h1>
+      <h1 className="text-2xl font-semibold text-slate-800">Week Calendar</h1>
 
-      <div className="mt-4 flex flex-wrap gap-4 border border-[#333] bg-[#222] p-4">
+      <div className="mt-4 flex flex-wrap gap-4 border border-slate-200 bg-white p-4 rounded-md shadow-sm">
         <label className="flex flex-col gap-1">
-          <span className="text-xs text-[#888]">Type</span>
+          <span className="text-xs font-medium text-slate-500">Type</span>
           <select
-            className="border border-[#444] bg-[#111] px-2 py-1 text-sm text-[#ddd]"
+            className={selectClass}
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
           >
@@ -85,9 +87,9 @@ export default function CalendarPage() {
           </select>
         </label>
         <label className="flex flex-col gap-1">
-          <span className="text-xs text-[#888]">Building</span>
+          <span className="text-xs font-medium text-slate-500">Building</span>
           <select
-            className="border border-[#444] bg-[#111] px-2 py-1 text-sm text-[#ddd]"
+            className={selectClass}
             value={filterBuilding}
             onChange={(e) => setFilterBuilding(e.target.value)}
           >
@@ -98,9 +100,9 @@ export default function CalendarPage() {
           </select>
         </label>
         <label className="flex flex-col gap-1">
-          <span className="text-xs text-[#888]">Resource</span>
+          <span className="text-xs font-medium text-slate-500">Resource</span>
           <select
-            className="border border-[#444] bg-[#111] px-2 py-1 text-sm text-[#ddd]"
+            className={selectClass}
             value={filterResource}
             onChange={(e) => setFilterResource(e.target.value)}
           >
@@ -111,11 +113,11 @@ export default function CalendarPage() {
           </select>
         </label>
         <label className="flex flex-col gap-1">
-          <span className="text-xs text-[#888]">Min capacity</span>
+          <span className="text-xs font-medium text-slate-500">Min capacity</span>
           <input
             type="number"
             min={0}
-            className="w-20 border border-[#444] bg-[#111] px-2 py-1 text-sm text-[#ddd]"
+            className={`w-20 ${selectClass}`}
             value={minCapacity || ''}
             onChange={(e) => setMinCapacity(parseInt(e.target.value, 10) || 0)}
           />
@@ -124,38 +126,38 @@ export default function CalendarPage() {
 
       <div className="mt-4 flex items-center justify-between">
         <button
-          className="border border-[#444] bg-[#222] px-3 py-1 text-sm text-[#ddd] hover:bg-[#333]"
+          className="border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 rounded transition-colors"
           onClick={prevWeek}
         >
           Prev week
         </button>
-        <span className="text-sm text-[#888]">
+        <span className="text-sm font-medium text-slate-600">
           {weekDates[0].toLocaleDateString()} – {weekDates[6].toLocaleDateString()}
         </span>
         <button
-          className="border border-[#444] bg-[#222] px-3 py-1 text-sm text-[#ddd] hover:bg-[#333]"
+          className="border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 rounded transition-colors"
           onClick={nextWeek}
         >
           Next week
         </button>
       </div>
 
-      <div className="mt-2 flex gap-4 text-xs text-[#888]">
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-green-900/60" /> Approved
+      <div className="mt-2 flex gap-4 text-xs text-slate-500">
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-3 rounded bg-green-200 border border-green-400" /> Approved
         </span>
-        <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-amber-900/60" /> Pending
+        <span className="flex items-center gap-1.5">
+          <span className="inline-block h-3 w-3 rounded bg-amber-200 border border-amber-400" /> Pending
         </span>
       </div>
 
-      <div className="mt-4 overflow-x-auto border border-[#333]">
+      <div className="mt-4 overflow-x-auto border border-slate-200 rounded-md shadow-sm">
         <table className="w-full border-collapse text-xs">
           <thead>
-            <tr className="border-b border-[#333] bg-[#222]">
-              <th className="w-16 border-r border-[#333] px-2 py-2 text-left font-semibold text-[#ddd]">Time</th>
+            <tr className="border-b border-slate-200 bg-slate-50">
+              <th className="w-16 border-r border-slate-200 px-2 py-2 text-left font-semibold text-slate-600">Time</th>
               {weekDates.map((d) => (
-                <th key={d.getTime()} className="border-r border-[#333] px-2 py-2 text-left font-semibold text-[#ddd] last:border-r-0">
+                <th key={d.getTime()} className="border-r border-slate-200 px-2 py-2 text-left font-semibold text-slate-600 last:border-r-0">
                   {DAYS[d.getDay() === 0 ? 6 : d.getDay() - 1]} {d.getDate()}
                 </th>
               ))}
@@ -163,8 +165,8 @@ export default function CalendarPage() {
           </thead>
           <tbody>
             {SLOTS.map((slot) => (
-              <tr key={slot} className="border-b border-[#333]">
-                <td className="border-r border-[#333] px-2 py-2 text-[#888]">{slot}</td>
+              <tr key={slot} className="border-b border-slate-100">
+                <td className="border-r border-slate-200 px-2 py-2 text-slate-500 bg-slate-50 font-medium">{slot}</td>
                 {weekDates.map((d) => {
                   const dateStr = formatDate(d)
                   const cells: { space: string; purpose?: string; status: string }[] = []
@@ -175,12 +177,14 @@ export default function CalendarPage() {
                     }
                   }
                   return (
-                    <td key={d.getTime()} className="border-r border-[#333] px-2 py-2 align-top last:border-r-0">
+                    <td key={d.getTime()} className="border-r border-slate-100 px-2 py-2 align-top last:border-r-0 bg-white">
                       {cells.map((c, i) => (
                         <div
                           key={i}
-                          className={`mb-1 rounded px-1 py-0.5 text-[#aaa] ${
-                            c.status === 'Pending' ? 'bg-amber-900/50 text-amber-200' : 'bg-green-900/40'
+                          className={`mb-1 rounded px-1.5 py-0.5 text-xs font-medium ${
+                            c.status === 'Pending'
+                              ? 'bg-amber-100 text-amber-700 border border-amber-300'
+                              : 'bg-green-100 text-green-700 border border-green-300'
                           }`}
                         >
                           {c.space} {c.purpose ? `(${c.purpose})` : ''}

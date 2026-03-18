@@ -38,15 +38,17 @@ export default function AdminSpacesPage() {
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-6">
-      <h1 className="text-2xl font-semibold text-[#ddd]">Manage Spaces</h1>
-      <p className="mt-2 text-sm text-[#888]">Edit space details (prototype)</p>
+      <h1 className="text-2xl font-semibold text-slate-800">Manage Spaces</h1>
+      <p className="mt-2 text-sm text-slate-500">Edit space details (prototype)</p>
 
       {spaces.length === 0 ? (
-        <StateMessage type="empty" title="No spaces" description="No spaces in the system." />
+        <div className="mt-6">
+          <StateMessage type="empty" title="No spaces" description="No spaces in the system." />
+        </div>
       ) : (
-        <div className="mt-6 space-y-4">
+        <div className="mt-6 space-y-3">
           {spaces.map((s) => (
-            <div key={s.id} className="border border-[#333] bg-[#222] p-4">
+            <div key={s.id} className="border border-slate-200 bg-white p-4 rounded-md shadow-sm">
               {editing === s.id ? (
                 <SpaceEditForm
                   space={s}
@@ -56,16 +58,16 @@ export default function AdminSpacesPage() {
               ) : (
                 <div className="flex items-start justify-between">
                   <div>
-                    <h2 className="font-semibold text-[#ddd]">{s.name}</h2>
-                    <p className="text-sm text-[#888]">
+                    <h2 className="font-semibold text-slate-800">{s.name}</h2>
+                    <p className="text-sm text-slate-500 mt-0.5">
                       {s.type} | Building: {s.building} | Capacity: {s.capacity}
                       {s.requiresApproval && ' | Requires approval'}
                     </p>
                     {s.resources.length > 0 && (
-                      <p className="text-xs text-[#666]">Resources: {s.resources.join(', ')}</p>
+                      <p className="text-xs text-slate-400 mt-0.5">Resources: {s.resources.join(', ')}</p>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2">
                     <Badge variant={s.status === 'AVAILABLE' ? 'success' : 'danger'}>{s.status}</Badge>
                     <Button variant="secondary" onClick={() => setEditing(s.id)}>Edit</Button>
                     <Button variant="primary" onClick={() => navigate(`/spaces/${s.id}`)}>View</Button>
@@ -94,6 +96,8 @@ function SpaceEditForm({
   const [status, setStatus] = useState<Space['status']>(space.status)
   const [requiresApproval, setRequiresApproval] = useState(space.requiresApproval)
 
+  const inputClass = 'border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]'
+
   return (
     <form
       className="flex flex-col gap-3"
@@ -103,28 +107,28 @@ function SpaceEditForm({
       }}
     >
       <label className="flex flex-col gap-1">
-        <span className="text-xs text-[#888]">Name</span>
+        <span className="text-xs font-medium text-slate-500">Name</span>
         <input
-          className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+          className={inputClass}
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
         />
       </label>
       <label className="flex flex-col gap-1">
-        <span className="text-xs text-[#888]">Capacity</span>
+        <span className="text-xs font-medium text-slate-500">Capacity</span>
         <input
           type="number"
           min={1}
-          className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+          className={inputClass}
           value={capacity}
           onChange={(e) => setCapacity(parseInt(e.target.value, 10) || 1)}
         />
       </label>
       <label className="flex flex-col gap-1">
-        <span className="text-xs text-[#888]">Status</span>
+        <span className="text-xs font-medium text-slate-500">Status</span>
         <select
-          className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+          className={inputClass}
           value={status}
           onChange={(e) => setStatus(e.target.value as Space['status'])}
         >
@@ -135,10 +139,11 @@ function SpaceEditForm({
       <label className="flex items-center gap-2">
         <input
           type="checkbox"
+          className="accent-[#003087]"
           checked={requiresApproval}
           onChange={(e) => setRequiresApproval(e.target.checked)}
         />
-        <span className="text-sm text-[#888]">Requires approval</span>
+        <span className="text-sm text-slate-600">Requires approval</span>
       </label>
       <div className="flex gap-2">
         <Button type="submit" variant="primary">Save</Button>

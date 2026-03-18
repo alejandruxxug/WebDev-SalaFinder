@@ -14,12 +14,12 @@ export default function Button({
   variant = 'primary',
   type = 'button',
 }: Props) {
-  const base = 'inline-flex items-center justify-center gap-2 px-3 py-2 text-sm border cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'
+  const base = 'inline-flex items-center justify-center gap-2 px-3 py-2 text-sm border rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-colors'
 
   const variants = {
-    primary: 'bg-[#444] text-white border-[#555] hover:bg-[#555]',
-    secondary: 'bg-[#222] text-[#ddd] border-[#444] hover:bg-[#333]',
-    danger: 'bg-[#222] text-red-400 border-red-800 hover:bg-[#2a2222]',
+    primary: 'bg-[#003087] text-white border-[#003087] hover:bg-[#002470]',
+    secondary: 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50',
+    danger: 'bg-white text-red-600 border-red-300 hover:bg-red-50',
   }
 
   return (

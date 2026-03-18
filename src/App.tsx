@@ -26,7 +26,7 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 
 function App() {
   return (
-    <div className="min-h-screen bg-[#111] text-[#ddd]">
+    <div className="min-h-screen bg-[#f4f6f9] text-[#0f1923]">
       <AuthGuard>
         <Navbar />
         <BlockedBanner />
