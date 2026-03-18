@@ -43,7 +43,7 @@ export default function AdminReservationsPage() {
   if (!isAdmin()) return null
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-6">
+    <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
       <h1 className="text-2xl font-semibold text-slate-800">All Reservations (Admin)</h1>
       <p className="mt-2 text-sm text-slate-500">Mark no-show on approved reservations. 2 no-shows = 7-day block.</p>
 

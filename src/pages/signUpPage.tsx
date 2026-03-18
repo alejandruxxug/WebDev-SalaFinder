@@ -78,7 +78,7 @@ export default function SignUpPage() {
   const inputClass = 'border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]'
 
   return (
-    <main className="mx-auto max-w-md px-6 py-10">
+    <main className="mx-auto max-w-md px-4 py-10 sm:px-6">
       <div className="mb-6 text-center">
         <p className="text-xs font-medium uppercase tracking-widest text-[#003087]">EIA University</p>
         <h1 className="mt-1 text-2xl font-bold text-slate-800">SalaFinder</h1>

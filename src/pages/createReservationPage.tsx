@@ -124,7 +124,7 @@ export default function CreateReservationPage() {
 
   if (!spaceId || !Number.isFinite(spaceId)) {
     return (
-      <main className="mx-auto max-w-md px-6 py-10">
+      <main className="mx-auto max-w-md px-4 py-10 sm:px-6">
         <StateMessage
           type="error"
           title="No space selected"
@@ -138,7 +138,7 @@ export default function CreateReservationPage() {
 
   if (!space) {
     return (
-      <main className="mx-auto max-w-md px-6 py-10">
+      <main className="mx-auto max-w-md px-4 py-10 sm:px-6">
         <StateMessage type="loading" title="Loading..." description="Fetching space..." />
       </main>
     )
@@ -146,7 +146,7 @@ export default function CreateReservationPage() {
 
   if (isBlocked()) {
     return (
-      <main className="mx-auto max-w-md px-6 py-10">
+      <main className="mx-auto max-w-md px-4 py-10 sm:px-6">
         <StateMessage
           type="error"
           title="Account blocked"
@@ -160,7 +160,7 @@ export default function CreateReservationPage() {
 
   if (submitted) {
     return (
-      <main className="mx-auto max-w-md px-6 py-10">
+      <main className="mx-auto max-w-md px-4 py-10 sm:px-6">
         <StateMessage
           type="empty"
           title="Reservation created!"

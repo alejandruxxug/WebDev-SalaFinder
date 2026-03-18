@@ -64,7 +64,7 @@ export default function HomePage() {
   const showEmpty = !loading && !error && filteredSpaces.length === 0
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-6">
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
       <h1 className="m-0 text-2xl font-semibold text-slate-800">Available Spaces</h1>
       <p className="mt-2 text-sm text-slate-500">
         Browse and reserve rooms, labs, and courts.

@@ -59,7 +59,7 @@ export default function ApprovalsPage() {
 
   if (reservations.length === 0) {
     return (
-      <main className="mx-auto max-w-4xl px-6 py-6">
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
         <h1 className="text-2xl font-semibold text-slate-800">Pending Approvals</h1>
         <div className="mt-6">
           <StateMessage type="empty" title="No pending approvals" description="All reservations are processed." />

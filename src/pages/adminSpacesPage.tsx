@@ -37,7 +37,7 @@ export default function AdminSpacesPage() {
   if (!isAdmin()) return null
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-6">
+    <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
       <h1 className="text-2xl font-semibold text-slate-800">Manage Spaces</h1>
       <p className="mt-2 text-sm text-slate-500">Edit space details (prototype)</p>
 
@@ -56,7 +56,7 @@ export default function AdminSpacesPage() {
                   onCancel={() => setEditing(null)}
                 />
               ) : (
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
                     <h2 className="font-semibold text-slate-800">{s.name}</h2>
                     <p className="text-sm text-slate-500 mt-0.5">
@@ -67,7 +67,7 @@ export default function AdminSpacesPage() {
                       <p className="text-xs text-slate-400 mt-0.5">Resources: {s.resources.join(', ')}</p>
                     )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Badge variant={s.status === 'AVAILABLE' ? 'success' : 'danger'}>{s.status}</Badge>
                     <Button variant="secondary" onClick={() => setEditing(s.id)}>Edit</Button>
                     <Button variant="primary" onClick={() => navigate(`/spaces/${s.id}`)}>View</Button>

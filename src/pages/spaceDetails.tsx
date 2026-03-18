@@ -42,7 +42,7 @@ export default function SpaceDetails() {
 
   if (loading) {
     return (
-      <main className="mx-auto max-w-3xl px-6 py-6">
+      <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
         <StateMessage type="loading" title="Loading space..." description="Fetching details..." />
       </main>
     )
@@ -50,7 +50,7 @@ export default function SpaceDetails() {
 
   if (error || !space) {
     return (
-      <main className="mx-auto max-w-3xl px-6 py-6">
+      <main className="mx-auto max-w-3xl px-4 py-6 sm:px-6">
         <StateMessage
           type="error"
           title="Space not found"

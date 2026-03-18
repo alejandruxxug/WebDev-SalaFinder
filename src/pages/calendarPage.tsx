@@ -69,7 +69,7 @@ export default function CalendarPage() {
   const selectClass = 'border border-slate-300 bg-white px-2 py-1.5 text-sm text-slate-700 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]'
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-6">
+    <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
       <h1 className="text-2xl font-semibold text-slate-800">Week Calendar</h1>
 
       <div className="mt-4 flex flex-wrap gap-4 border border-slate-200 bg-white p-4 rounded-md shadow-sm">

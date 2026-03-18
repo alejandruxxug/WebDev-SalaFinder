@@ -61,7 +61,7 @@ export default function LoginPage() {
   }, [submitted, email, navigate, from])
 
   return (
-    <main className="mx-auto max-w-md px-6 py-10">
+    <main className="mx-auto max-w-md px-4 py-10 sm:px-6">
       <div className="mb-6 text-center">
         <p className="text-xs font-medium uppercase tracking-widest text-[#003087]">EIA University</p>
         <h1 className="mt-1 text-2xl font-bold text-slate-800">SalaFinder</h1>

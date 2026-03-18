@@ -26,7 +26,7 @@ export default function ReservationsPage() {
 
   if (!user) {
     return (
-      <main className="mx-auto max-w-4xl px-6 py-6">
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
         <StateMessage type="error" title="Not logged in" description="Log in to see your reservations." actionText="Log in" onAction={() => navigate('/login')} />
       </main>
     )
@@ -34,7 +34,7 @@ export default function ReservationsPage() {
 
   if (reservations.length === 0) {
     return (
-      <main className="mx-auto max-w-4xl px-6 py-6">
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
         <h1 className="text-2xl font-semibold text-slate-800">My Reservations</h1>
         <div className="mt-6">
           <StateMessage
