@@ -22,6 +22,10 @@ export default function LoginPage() {
       setError('Email and password are required')
       return
     }
+    if (!email.trim().toLowerCase().endsWith('@eia.edu.co')) {
+      setError('Only @eia.edu.co email addresses can access this app')
+      return
+    }
     const users = getUsers()
     const user = users.find((u) => u.email.toLowerCase() === email.trim().toLowerCase())
     if (!user || user.password !== password) {
@@ -49,6 +53,7 @@ export default function LoginPage() {
         role: user.role,
         noShowCount: user.noShowCount,
         blockedUntil: user.blockedUntil,
+        major: user.major,
       },
     }
     localStorage.setItem(SESSION_KEY, JSON.stringify(session))
@@ -62,7 +67,7 @@ export default function LoginPage() {
           <FiLogIn className="text-[#888]" />
           <h1 className="text-xl font-semibold">Log In</h1>
         </div>
-        <p className="mt-2 text-sm text-[#888]">Use a seed account (e.g. admin@test.com / 1234)</p>
+        <p className="mt-2 text-sm text-[#888]">Sign in with your @eia.edu.co email</p>
 
         {!submitted && (
           <form className="mt-4 flex flex-col gap-3" onSubmit={onSubmit}>
@@ -71,7 +76,7 @@ export default function LoginPage() {
               <input
                 className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
                 type="email"
-                placeholder="you@example.com"
+                placeholder="you@eia.edu.co"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required

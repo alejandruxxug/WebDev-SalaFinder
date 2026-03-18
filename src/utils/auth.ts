@@ -9,6 +9,7 @@ export interface SessionUser {
   role: string
   noShowCount: number
   blockedUntil?: string
+  major?: string
 }
 
 export function getSessionUser(): SessionUser | null {
@@ -30,6 +31,7 @@ export function isLoggedIn(): boolean {
 export function isBlocked(): boolean {
   const user = getSessionUser()
   if (!user?.blockedUntil) return false
+  if (user.role === 'Admin') return false // admins cannot be blocked
   return new Date(user.blockedUntil) > new Date()
 }
 

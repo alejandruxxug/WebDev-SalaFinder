@@ -3,7 +3,7 @@
 export type SpaceStatus = 'AVAILABLE' | 'UNAVAILABLE'
 export type SpaceType = 'Class' | 'Lab' | 'Court'
 export type ReservationStatus = 'Pending' | 'Approved' | 'Rejected' | 'Cancelled'
-export type UserRole = 'Student' | 'Staff' | 'Admin'
+export type UserRole = 'Student' | 'Admin'
 
 export interface Space {
   id: number
@@ -38,6 +38,7 @@ export interface User {
   role: UserRole
   noShowCount: number
   blockedUntil?: string
+  major?: string
 }
 
 export interface AuditLog {

@@ -10,6 +10,7 @@ import type { User } from '../types'
 export default function SignUpPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [major, setMajor] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [submitted, setSubmitted] = useState(false)
@@ -19,8 +20,12 @@ export default function SignUpPage() {
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!name.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+    if (!name.trim() || !email.trim() || !major.trim() || !password.trim() || !confirmPassword.trim()) {
       setError('All fields are required')
+      return
+    }
+    if (!email.trim().toLowerCase().endsWith('@eia.edu.co')) {
+      setError('Only @eia.edu.co email addresses are allowed')
       return
     }
     if (password !== confirmPassword) {
@@ -51,6 +56,7 @@ export default function SignUpPage() {
       password,
       role: 'Student',
       noShowCount: 0,
+      major: major.trim() || undefined,
     }
     users.push(newUser)
     saveUsers(users)
@@ -62,11 +68,12 @@ export default function SignUpPage() {
         role: newUser.role,
         noShowCount: newUser.noShowCount,
         blockedUntil: newUser.blockedUntil,
+        major: newUser.major,
       },
     }
     localStorage.setItem(SESSION_KEY, JSON.stringify(session))
     navigate('/')
-  }, [submitted, name, email, password, navigate])
+  }, [submitted, name, email, major, password, navigate])
 
   return (
     <main className="mx-auto max-w-md px-6 py-10">
@@ -75,8 +82,7 @@ export default function SignUpPage() {
           <FiUserPlus className="text-[#888]" />
           <h1 className="text-xl font-semibold">Sign Up</h1>
         </div>
-        <p className="mt-2 text-sm text-[#888]">Create an account!</p>
-
+        <p className="mt-2 text-sm text-[#888]">Create an account with your @eia.edu.co email</p>
         {!submitted && (
           <form className="mt-4 flex flex-col gap-3" onSubmit={onSubmit}>
             <label className="flex flex-col gap-2">
@@ -98,6 +104,17 @@ export default function SignUpPage() {
                 placeholder="you@eia.edu.co"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </label>
+            <label className="flex flex-col gap-2">
+              <span className="text-xs text-[#888]">Major</span>
+              <input
+                className="border border-[#444] bg-[#111] px-3 py-2 text-sm text-[#ddd]"
+                type="text"
+                placeholder="e.g. Computer Science, Electrical Engineering"
+                value={major}
+                onChange={(e) => setMajor(e.target.value)}
                 required
               />
             </label>

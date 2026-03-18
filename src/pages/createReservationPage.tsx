@@ -1,4 +1,4 @@
-// reservation form: date, time, capacity, conflict check, auto-approve when space.requiresApproval=false
+// reservation form: date, time, capacity, conflict check; all reservations require admin approval
 import { useState, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import Button from '../components/ui/Button'
@@ -69,7 +69,7 @@ export default function CreateReservationPage() {
       else if (n > maxCapacity) errs.attendeeCount = `Max capacity: ${maxCapacity}`
     }
     if (startTime && endTime && date && hasConflict(spaceId!, date, startTime, endTime)) {
-      errs.timeSlot = 'Time slot conflicts with an approved reservation'
+      errs.timeSlot = 'This time slot is already reserved. Choose another.'
     }
     setFieldErrors(errs)
     return Object.keys(errs).length === 0
@@ -93,9 +93,15 @@ export default function CreateReservationPage() {
     }
     if (!validate()) return
 
+    // Final check: block if space is already reserved (Pending or Approved)
+    if (hasConflict(space.id, date, startTime, endTime)) {
+      setError('This time slot was just reserved. Please choose another.')
+      return
+    }
+
     const reservations = getReservations()
     const nextId = reservations.length ? Math.max(...reservations.map((r) => r.id)) + 1 : 1
-    const status = space.requiresApproval ? 'Pending' : 'Approved'
+    const status = 'Pending'
 
     const newReservation: Reservation = {
       id: nextId,
@@ -158,13 +164,13 @@ export default function CreateReservationPage() {
         <StateMessage
           type="empty"
           title="Reservation created!"
-          description={space.requiresApproval ? 'Awaiting approval.' : 'Approved automatically.'}
+          description="Awaiting admin approval."
         />
       </main>
     )
   }
 
-  const conflicts = startTime && endTime && date
+  const conflicts = startTime && endTime && date && spaceId
     ? getConflictingReservations(spaceId, date, startTime, endTime)
     : []
 
@@ -174,7 +180,6 @@ export default function CreateReservationPage() {
         <h1 className="text-xl font-semibold text-[#ddd]">Create Reservation</h1>
         <p className="mt-2 text-sm text-[#888]">
           <strong>{space.name}</strong> ({space.type}) — Capacity: {space.capacity}
-          {space.requiresApproval && ' — Requires approval'}
         </p>
 
         <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
@@ -210,16 +215,21 @@ export default function CreateReservationPage() {
               required
             >
               <option value="">Select...</option>
-              {TIME_SLOTS.map((t) => (
-                <option key={t.start} value={`${t.start}-${t.end}`}>
-                  {t.start} - {t.end}
-                </option>
-              ))}
+              {TIME_SLOTS.map((t) => {
+                const taken = date && spaceId
+                  ? hasConflict(spaceId, date, t.start, t.end)
+                  : false
+                return (
+                  <option key={t.start} value={`${t.start}-${t.end}`} disabled={taken}>
+                    {t.start} - {t.end}{taken ? ' (taken)' : ''}
+                  </option>
+                )
+              })}
             </select>
             {fieldErrors.timeSlot && <span className="text-xs text-red-400">{fieldErrors.timeSlot}</span>}
             {conflicts.length > 0 && (
               <span className="text-xs text-amber-400">
-                Conflicts with: {conflicts.map((c) => `${c.space} ${c.date} ${c.startTime}-${c.endTime}`).join(', ')}
+                Already reserved: {conflicts.map((c) => `${c.date} ${c.startTime}-${c.endTime} (${c.status})`).join(', ')}
               </span>
             )}
           </label>
@@ -254,7 +264,7 @@ export default function CreateReservationPage() {
           {error && <p className="text-sm text-red-400" role="alert">{error}</p>}
 
           <div className="flex gap-2">
-            <Button type="submit" variant="primary">
+            <Button type="submit" variant="primary" disabled={conflicts.length > 0}>
               Create reservation
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate('/')}>

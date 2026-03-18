@@ -31,7 +31,9 @@ export default function CalendarPage() {
 
   const spaces = getSpaces()
   const reservations = getReservations()
-  const approved = reservations.filter((r) => r.status === 'Approved')
+  const displayReservations = reservations.filter(
+    (r) => r.status === 'Approved' || r.status === 'Pending'
+  )
 
   const weekDates = useMemo(() => getWeekDates(baseDate), [baseDate])
 
@@ -46,7 +48,7 @@ export default function CalendarPage() {
   }, [spaces, filterType, filterBuilding, filterResource, minCapacity])
 
   const spaceIds = new Set(filteredSpaces.map((s) => s.id))
-  const filteredReservations = approved.filter((r) => spaceIds.has(r.spaceId))
+  const filteredReservations = displayReservations.filter((r) => spaceIds.has(r.spaceId))
 
   const types = Array.from(new Set(spaces.map((s) => s.type))).sort()
   const buildings = Array.from(new Set(spaces.map((s) => s.building))).sort()
@@ -138,6 +140,15 @@ export default function CalendarPage() {
         </button>
       </div>
 
+      <div className="mt-2 flex gap-4 text-xs text-[#888]">
+        <span className="flex items-center gap-1">
+          <span className="inline-block h-3 w-3 rounded bg-green-900/60" /> Approved
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="inline-block h-3 w-3 rounded bg-amber-900/60" /> Pending
+        </span>
+      </div>
+
       <div className="mt-4 overflow-x-auto border border-[#333]">
         <table className="w-full border-collapse text-xs">
           <thead>
@@ -156,17 +167,22 @@ export default function CalendarPage() {
                 <td className="border-r border-[#333] px-2 py-2 text-[#888]">{slot}</td>
                 {weekDates.map((d) => {
                   const dateStr = formatDate(d)
-                  const cells: { space: string; purpose?: string }[] = []
+                  const cells: { space: string; purpose?: string; status: string }[] = []
                   for (const r of filteredReservations) {
                     if (r.date !== dateStr) continue
                     if (r.startTime <= slot && r.endTime > slot) {
-                      cells.push({ space: r.space, purpose: r.purpose })
+                      cells.push({ space: r.space, purpose: r.purpose, status: r.status })
                     }
                   }
                   return (
                     <td key={d.getTime()} className="border-r border-[#333] px-2 py-2 align-top last:border-r-0">
                       {cells.map((c, i) => (
-                        <div key={i} className="mb-1 rounded bg-green-900/40 px-1 py-0.5 text-[#aaa]">
+                        <div
+                          key={i}
+                          className={`mb-1 rounded px-1 py-0.5 text-[#aaa] ${
+                            c.status === 'Pending' ? 'bg-amber-900/50 text-amber-200' : 'bg-green-900/40'
+                          }`}
+                        >
                           {c.space} {c.purpose ? `(${c.purpose})` : ''}
                         </div>
                       ))}

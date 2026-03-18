@@ -1,10 +1,12 @@
-// conflict detection - no overlapping approved reservations for same space
+// conflict detection - no overlapping reservations for same space
+// Pending and Approved both block; Rejected and Cancelled do not
 import { getReservations } from './storage'
 import type { Reservation } from '../types'
 
+const BLOCKING_STATUSES: Reservation['status'][] = ['Pending', 'Approved']
+
 function parseTime(date: string, time: string): number {
-  const [h, m] = time.split(':').map(Number)
-  return new Date(`${date}T${h}:${m ?? 0}:00`).getTime()
+  return new Date(`${date}T${time}:00`).getTime()
 }
 
 export function hasConflict(
@@ -19,7 +21,7 @@ export function hasConflict(
   const end = parseTime(date, endTime)
 
   for (const r of reservations) {
-    if (r.spaceId !== spaceId || r.status !== 'Approved') continue
+    if (r.spaceId !== spaceId || !BLOCKING_STATUSES.includes(r.status)) continue
     if (excludeReservationId && r.id === excludeReservationId) continue
 
     const rStart = parseTime(r.date, r.startTime)
@@ -42,7 +44,7 @@ export function getConflictingReservations(
   const conflicts: Reservation[] = []
 
   for (const r of reservations) {
-    if (r.spaceId !== spaceId || r.status !== 'Approved') continue
+    if (r.spaceId !== spaceId || !BLOCKING_STATUSES.includes(r.status)) continue
     if (excludeReservationId && r.id === excludeReservationId) continue
 
     const rStart = parseTime(r.date, r.startTime)

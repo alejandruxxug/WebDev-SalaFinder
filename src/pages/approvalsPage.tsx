@@ -28,7 +28,7 @@ export default function ApprovalsPage() {
 
   function handleApprove(r: Reservation) {
     if (hasConflict(r.spaceId, r.date, r.startTime, r.endTime, r.id)) {
-      alert('Cannot approve: conflicts with existing approved reservation')
+      alert('Cannot approve: this time slot is already reserved by another reservation')
       return
     }
     const all = getReservations()
