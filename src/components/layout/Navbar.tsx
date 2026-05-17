@@ -1,8 +1,7 @@
-// top nav with links, shows Log out when logged in
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { FiLogIn, FiUserPlus, FiList, FiLogOut, FiCheckCircle, FiMenu, FiX } from 'react-icons/fi'
-import { isLoggedIn, logout, isAdmin } from '../../utils/auth'
+import { isLoggedIn, logout, isAdmin, isAdminOrStaff } from '../../utils/auth'
 
 const linkBase = 'text-sm text-blue-200 hover:text-white hover:bg-[#002470] px-3 py-1.5 rounded transition-colors'
 const active = 'text-white bg-[#002470] font-semibold'
@@ -25,33 +24,40 @@ export default function Navbar() {
   const navLinks = (
     <>
       <NavLink to="/" end className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-        Spaces
+        Espacios
       </NavLink>
       <NavLink to="/calendar" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-        Calendar
+        Calendario
       </NavLink>
       <NavLink to="/reservations" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
         <span className="inline-flex items-center gap-1.5">
           <FiList />
-          My Reservations
+          Mis reservas
         </span>
       </NavLink>
       <NavLink to="/reservations/new" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-        New Reservation
+        Nueva reserva
       </NavLink>
       {loggedIn && isAdmin() && (
+        <NavLink to="/approvals" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
+          <span className="inline-flex items-center gap-1.5">
+            <FiCheckCircle />
+            Aprobaciones
+          </span>
+        </NavLink>
+      )}
+      {loggedIn && isAdminOrStaff() && (
+        <NavLink to="/admin/reservations" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
+          Todas las reservas
+        </NavLink>
+      )}
+      {loggedIn && isAdmin() && (
         <>
-          <NavLink to="/approvals" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-            <span className="inline-flex items-center gap-1.5">
-              <FiCheckCircle />
-              Approvals
-            </span>
-          </NavLink>
-          <NavLink to="/admin/reservations" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-            No-shows
-          </NavLink>
           <NavLink to="/admin/spaces" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-            Manage Spaces
+            Gestionar espacios
+          </NavLink>
+          <NavLink to="/admin/audit" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
+            Auditoría
           </NavLink>
         </>
       )}
@@ -61,20 +67,20 @@ export default function Navbar() {
           className={`${linkBase} inline-flex items-center gap-1.5 border-none bg-transparent cursor-pointer`}
         >
           <FiLogOut />
-          Log out
+          Cerrar sesión
         </button>
       ) : (
         <>
           <NavLink to="/login" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
             <span className="inline-flex items-center gap-1.5">
               <FiLogIn />
-              Log In
+              Ingresar
             </span>
           </NavLink>
           <NavLink to="/signup" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
             <span className="inline-flex items-center gap-1.5">
               <FiUserPlus />
-              Sign Up
+              Registro
             </span>
           </NavLink>
         </>
@@ -98,7 +104,7 @@ export default function Navbar() {
           {navLinks}
         </nav>
 
-        {/* Mobile hamburger button */}
+        {/* Mobile hamburger */}
         <button
           className="md:hidden text-blue-200 hover:text-white p-2 rounded transition-colors"
           onClick={() => setMenuOpen((v) => !v)}
@@ -109,7 +115,6 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile dropdown menu */}
       {menuOpen && (
         <div className="md:hidden border-t border-[#002470] bg-[#003087]">
           <nav className="mx-auto max-w-6xl px-4 py-2 flex flex-col gap-1" aria-label="Mobile navigation">

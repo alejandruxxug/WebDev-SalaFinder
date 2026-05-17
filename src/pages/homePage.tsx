@@ -1,10 +1,9 @@
-// main listing, fetches spaces and filters by search/type/availability
 import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import SpaceList from '../components/spaces/SpaceList'
 import FilterBar from '../components/spaces/FilterBar'
 import StateMessage from '../components/ui/StateMessage'
-import { getSpaces } from '../services/spaceService'
+import { fetchSpaces } from '../api/spaces'
 import type { Space } from '../types'
 
 export default function HomePage() {
@@ -13,47 +12,64 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null)
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [selectedType, setSelectedType] = useState<string>('ALL')
+  const [selectedType, setSelectedType] = useState('ALL')
+  const [selectedBuilding, setSelectedBuilding] = useState('ALL')
+  const [selectedResource, setSelectedResource] = useState('ALL')
+  const [minCapacity, setMinCapacity] = useState('')
   const [onlyAvailable, setOnlyAvailable] = useState(false)
 
   const navigate = useNavigate()
 
-  // load spaces on mount
   useEffect(() => {
-    async function loadSpaces() {
-      try {
-        setLoading(true)
-        setError(null)
-        const data = await getSpaces()
-        setSpaces(data)
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Unknown error')
-      } finally {
-        setLoading(false)
-      }
+    let cancelled = false
+    async function load() {
+      setLoading(true)
+      setError(null)
+      const res = await fetchSpaces()
+      if (cancelled) return
+      if (!res.ok) setError(res.error)
+      else setSpaces(res.data)
+      setLoading(false)
     }
-    void loadSpaces()
+    void load()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  // unique types for filter dropdown
-  const types = useMemo(() => {
-    return Array.from(new Set(spaces.map((s) => s.type))).sort()
-  }, [spaces])
+  const types = useMemo(
+    () => Array.from(new Set(spaces.map((s) => s.type))).sort(),
+    [spaces],
+  )
+  const buildings = useMemo(
+    () => Array.from(new Set(spaces.map((s) => s.building))).sort(),
+    [spaces],
+  )
+  const resources = useMemo(
+    () => Array.from(new Set(spaces.flatMap((s) => s.resources))).sort(),
+    [spaces],
+  )
 
-  // filter by search, type, availability
   const filteredSpaces = useMemo(() => {
     const term = searchTerm.trim().toLowerCase()
+    const min = parseInt(minCapacity, 10)
     return spaces.filter((s) => {
-      const matchesSearch = s.name.toLowerCase().includes(term)
-      const matchesType = selectedType === 'ALL' || s.type === selectedType
-      const matchesAvailability = !onlyAvailable || s.status === 'AVAILABLE'
-      return matchesSearch && matchesType && matchesAvailability
+      if (term && !s.name.toLowerCase().includes(term)) return false
+      if (selectedType !== 'ALL' && s.type !== selectedType) return false
+      if (selectedBuilding !== 'ALL' && s.building !== selectedBuilding) return false
+      if (selectedResource !== 'ALL' && !s.resources.includes(selectedResource)) return false
+      if (!Number.isNaN(min) && min > 0 && s.capacity < min) return false
+      if (onlyAvailable && s.status !== 'AVAILABLE') return false
+      return true
     })
-  }, [spaces, searchTerm, selectedType, onlyAvailable])
+  }, [spaces, searchTerm, selectedType, selectedBuilding, selectedResource, minCapacity, onlyAvailable])
 
   function handleReset() {
     setSearchTerm('')
     setSelectedType('ALL')
+    setSelectedBuilding('ALL')
+    setSelectedResource('ALL')
+    setMinCapacity('')
     setOnlyAvailable(false)
   }
 
@@ -65,9 +81,9 @@ export default function HomePage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-      <h1 className="m-0 text-2xl font-semibold text-slate-800">Available Spaces</h1>
+      <h1 className="m-0 text-2xl font-semibold text-slate-800">Espacios disponibles</h1>
       <p className="mt-2 text-sm text-slate-500">
-        Browse and reserve rooms, labs, and courts.
+        Explora y reserva salas, laboratorios y canchas.
       </p>
 
       <FilterBar
@@ -76,6 +92,14 @@ export default function HomePage() {
         types={types}
         selectedType={selectedType}
         onSelectedType={setSelectedType}
+        buildings={buildings}
+        selectedBuilding={selectedBuilding}
+        onSelectedBuilding={setSelectedBuilding}
+        resources={resources}
+        selectedResource={selectedResource}
+        onSelectedResource={setSelectedResource}
+        minCapacity={minCapacity}
+        onMinCapacity={setMinCapacity}
         onlyAvailable={onlyAvailable}
         onSetOnlyAvailable={setOnlyAvailable}
         onReset={handleReset}
@@ -83,7 +107,7 @@ export default function HomePage() {
 
       <div className="mt-3 flex justify-end">
         <span className="border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500 rounded">
-          Results: {filteredSpaces.length}
+          Resultados: {filteredSpaces.length}
         </span>
       </div>
 
@@ -91,23 +115,23 @@ export default function HomePage() {
         {loading ? (
           <StateMessage
             type="loading"
-            title="Loading spaces..."
-            description="Please wait a moment."
+            title="Cargando espacios..."
+            description="Un momento por favor."
           />
         ) : error ? (
           <StateMessage
             type="error"
-            title="Failed to load spaces"
+            title="No se pudieron cargar los espacios"
             description={error}
-            actionText="Try again"
+            actionText="Reintentar"
             onAction={() => window.location.reload()}
           />
         ) : showEmpty ? (
           <StateMessage
             type="empty"
-            title="No results"
-            description="Try changing the filters or resetting them."
-            actionText="Reset filters"
+            title="Sin resultados"
+            description="Cambia los filtros o restablécelos."
+            actionText="Restablecer filtros"
             onAction={handleReset}
           />
         ) : (
