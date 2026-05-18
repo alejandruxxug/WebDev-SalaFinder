@@ -113,7 +113,7 @@ export default function AdminReservationsPage() {
                 <th className="px-4 py-3 text-left font-semibold text-slate-600">Fecha</th>
                 <th className="px-4 py-3 text-left font-semibold text-slate-600">Hora</th>
                 <th className="px-4 py-3 text-left font-semibold text-slate-600">Estado</th>
-                {isAdmin() && (
+                {isAdminOrStaff() && (
                   <th className="px-4 py-3 text-left font-semibold text-slate-600">Acciones</th>
                 )}
               </tr>
@@ -126,7 +126,7 @@ export default function AdminReservationsPage() {
                   <td className="px-4 py-3 text-slate-700">{r.date}</td>
                   <td className="px-4 py-3 text-slate-700">{r.startTime} - {r.endTime}</td>
                   <td className={`px-4 py-3 font-medium ${getStatusColor(r.status)}`}>{r.status}</td>
-                  {isAdmin() && (
+                  {isAdminOrStaff() && (
                     <td className="px-4 py-3">
                       {r.status === 'Approved' && (
                         <Button variant="secondary" onClick={() => handleNoShow(r)}>
