@@ -2,9 +2,15 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/ui/Button'
 import StateMessage from '../components/ui/StateMessage'
+import ConfirmModal from '../components/ui/ConfirmModal'
 import { cancelReservation, fetchMyReservations } from '../api/reservations'
 import { getSessionUser } from '../utils/auth'
 import type { Reservation } from '../types'
+
+type ModalState =
+  | { kind: 'cancel'; reservation: Reservation }
+  | { kind: 'error'; message: string }
+  | null
 
 function getStatusColor(status: string) {
   if (status === 'Pending') return 'text-amber-600'
@@ -17,8 +23,13 @@ export default function ReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [modal, setModal] = useState<ModalState>(null)
   const navigate = useNavigate()
   const user = getSessionUser()
+
+  function closeModal() {
+    setModal(null)
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -36,11 +47,17 @@ export default function ReservationsPage() {
     // user is reparsed from localStorage each render (new ref), so depend on its id
   }, [user?.id, load])
 
-  async function handleCancel(r: Reservation) {
-    if (!confirm('¿Cancelar esta reserva?')) return
+  function handleCancel(r: Reservation) {
+    setModal({ kind: 'cancel', reservation: r })
+  }
+
+  async function confirmCancel() {
+    if (modal?.kind !== 'cancel') return
+    const r = modal.reservation
+    setModal(null)
     const res = await cancelReservation(r.id)
     if (!res.ok) {
-      alert(res.error)
+      setModal({ kind: 'error', message: res.error })
       return
     }
     void load()
@@ -113,6 +130,32 @@ export default function ReservationsPage() {
           </table>
         </div>
       )}
+
+      <ConfirmModal
+        open={modal?.kind === 'cancel'}
+        title="Cancelar reserva"
+        description={
+          modal?.kind === 'cancel'
+            ? `¿Cancelar esta reserva?\n\n${modal.reservation.space}\n${modal.reservation.date} · ${modal.reservation.startTime} - ${modal.reservation.endTime}`
+            : undefined
+        }
+        confirmText="Sí, cancelar"
+        cancelText="Volver"
+        variant="danger"
+        onConfirm={confirmCancel}
+        onClose={closeModal}
+      />
+
+      <ConfirmModal
+        open={modal?.kind === 'error'}
+        title="Error"
+        description={modal?.kind === 'error' ? modal.message : undefined}
+        confirmText="Entendido"
+        cancelText=""
+        variant="primary"
+        onConfirm={closeModal}
+        onClose={closeModal}
+      />
     </main>
   )
 }

@@ -2,9 +2,16 @@ import { useState, useEffect, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/ui/Button'
 import StateMessage from '../components/ui/StateMessage'
+import ConfirmModal from '../components/ui/ConfirmModal'
 import { fetchAllReservations, markNoShow, unblockUsers } from '../api/reservations'
 import { isAdmin, isAdminOrStaff } from '../utils/auth'
 import type { Reservation } from '../types'
+
+type ModalState =
+  | { kind: 'noShow'; reservation: Reservation }
+  | { kind: 'info'; title: string; message: string }
+  | { kind: 'error'; message: string }
+  | null
 
 function getStatusColor(status: string) {
   if (status === 'Pending') return 'text-amber-600'
@@ -17,7 +24,12 @@ export default function AdminReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [modal, setModal] = useState<ModalState>(null)
   const navigate = useNavigate()
+
+  function closeModal() {
+    setModal(null)
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -37,12 +49,18 @@ export default function AdminReservationsPage() {
     void load()
   }, [navigate, load])
 
-  async function handleNoShow(r: Reservation) {
+  function handleNoShow(r: Reservation) {
     if (r.status !== 'Approved') return
-    if (!confirm('¿Marcar no-show? Si el usuario acumula 2 no-shows, será bloqueado por 7 días.')) return
+    setModal({ kind: 'noShow', reservation: r })
+  }
+
+  async function confirmNoShow() {
+    if (modal?.kind !== 'noShow') return
+    const r = modal.reservation
+    setModal(null)
     const res = await markNoShow(r.id)
     if (!res.ok) {
-      alert(res.error)
+      setModal({ kind: 'error', message: res.error })
       return
     }
     void load()
@@ -51,10 +69,10 @@ export default function AdminReservationsPage() {
   async function handleUnblock() {
     const res = await unblockUsers()
     if (!res.ok) {
-      alert(res.error)
+      setModal({ kind: 'error', message: res.error })
       return
     }
-    alert(res.data.message)
+    setModal({ kind: 'info', title: 'Desbloqueo completado', message: res.data.message })
   }
 
   if (!isAdminOrStaff()) return null
@@ -123,6 +141,43 @@ export default function AdminReservationsPage() {
           </table>
         </div>
       )}
+
+      <ConfirmModal
+        open={modal?.kind === 'noShow'}
+        title="Marcar no-show"
+        description={
+          modal?.kind === 'noShow'
+            ? `¿Marcar no-show para ${modal.reservation.userFullName ?? 'este usuario'} en ${modal.reservation.space}?\n\nSi el usuario acumula 2 no-shows, será bloqueado por 7 días.`
+            : undefined
+        }
+        confirmText="Marcar no-show"
+        cancelText="Cancelar"
+        variant="danger"
+        onConfirm={confirmNoShow}
+        onClose={closeModal}
+      />
+
+      <ConfirmModal
+        open={modal?.kind === 'info'}
+        title={modal?.kind === 'info' ? modal.title : ''}
+        description={modal?.kind === 'info' ? modal.message : undefined}
+        confirmText="Entendido"
+        cancelText=""
+        variant="primary"
+        onConfirm={closeModal}
+        onClose={closeModal}
+      />
+
+      <ConfirmModal
+        open={modal?.kind === 'error'}
+        title="Error"
+        description={modal?.kind === 'error' ? modal.message : undefined}
+        confirmText="Entendido"
+        cancelText=""
+        variant="primary"
+        onConfirm={closeModal}
+        onClose={closeModal}
+      />
     </main>
   )
 }

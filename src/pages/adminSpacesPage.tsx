@@ -3,9 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import Button from '../components/ui/Button'
 import StateMessage from '../components/ui/StateMessage'
 import Badge from '../components/ui/Badge'
+import ConfirmModal from '../components/ui/ConfirmModal'
 import { createSpace, deleteSpace, fetchSpaces, updateSpace } from '../api/spaces'
 import { isAdmin } from '../utils/auth'
 import type { Space } from '../types'
+
+type ModalState =
+  | { kind: 'delete'; space: Space }
+  | { kind: 'error'; message: string }
+  | null
 
 interface SpaceFormState {
   name: string
@@ -50,7 +56,12 @@ export default function AdminSpacesPage() {
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
+  const [modal, setModal] = useState<ModalState>(null)
   const navigate = useNavigate()
+
+  function closeModal() {
+    setModal(null)
+  }
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -73,7 +84,7 @@ export default function AdminSpacesPage() {
   async function handleSave(id: string, form: SpaceFormState) {
     const res = await updateSpace(id, form)
     if (!res.ok) {
-      alert(res.error)
+      setModal({ kind: 'error', message: res.error })
       return
     }
     setEditing(null)
@@ -83,18 +94,24 @@ export default function AdminSpacesPage() {
   async function handleCreate(form: SpaceFormState) {
     const res = await createSpace(form)
     if (!res.ok) {
-      alert(res.error)
+      setModal({ kind: 'error', message: res.error })
       return
     }
     setCreating(false)
     void load()
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('¿Eliminar este espacio?')) return
+  function handleDelete(s: Space) {
+    setModal({ kind: 'delete', space: s })
+  }
+
+  async function confirmDelete() {
+    if (modal?.kind !== 'delete') return
+    const id = modal.space.id
+    setModal(null)
     const res = await deleteSpace(id)
     if (!res.ok) {
-      alert(res.error)
+      setModal({ kind: 'error', message: res.error })
       return
     }
     void load()
@@ -169,7 +186,7 @@ export default function AdminSpacesPage() {
                       {s.status === 'AVAILABLE' ? 'DISPONIBLE' : 'NO DISPONIBLE'}
                     </Badge>
                     <Button variant="secondary" onClick={() => setEditing(s.id)}>Editar</Button>
-                    <Button variant="secondary" onClick={() => handleDelete(s.id)}>Eliminar</Button>
+                    <Button variant="secondary" onClick={() => handleDelete(s)}>Eliminar</Button>
                     <Button variant="primary" onClick={() => navigate(`/spaces/${s.id}`)}>Ver</Button>
                   </div>
                 </div>
@@ -178,6 +195,32 @@ export default function AdminSpacesPage() {
           ))}
         </div>
       )}
+
+      <ConfirmModal
+        open={modal?.kind === 'delete'}
+        title="Eliminar espacio"
+        description={
+          modal?.kind === 'delete'
+            ? `¿Eliminar el espacio "${modal.space.name}"? Esta acción no se puede deshacer.`
+            : undefined
+        }
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        variant="danger"
+        onConfirm={confirmDelete}
+        onClose={closeModal}
+      />
+
+      <ConfirmModal
+        open={modal?.kind === 'error'}
+        title="Error"
+        description={modal?.kind === 'error' ? modal.message : undefined}
+        confirmText="Entendido"
+        cancelText=""
+        variant="primary"
+        onConfirm={closeModal}
+        onClose={closeModal}
+      />
     </main>
   )
 }
