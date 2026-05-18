@@ -30,11 +30,15 @@ export default function ConfirmModal({
 
   useEffect(() => {
     if (!open) return
+    confirmRef.current?.focus()
+  }, [open])
+
+  useEffect(() => {
+    if (!open) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
     window.addEventListener('keydown', onKey)
-    confirmRef.current?.focus()
     return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
