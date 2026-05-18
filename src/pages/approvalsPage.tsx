@@ -105,6 +105,7 @@ export default function ApprovalsPage() {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b border-slate-200 bg-slate-50">
+                <th className="px-4 py-3 text-left font-semibold text-slate-600">ID</th>
                 <th className="px-4 py-3 text-left font-semibold text-slate-600">Espacio</th>
                 <th className="px-4 py-3 text-left font-semibold text-slate-600">Usuario</th>
                 <th className="px-4 py-3 text-left font-semibold text-slate-600">Fecha</th>
@@ -116,6 +117,7 @@ export default function ApprovalsPage() {
             <tbody>
               {reservations.map((r) => (
                 <tr key={r.id} className="border-b border-slate-100 bg-white hover:bg-slate-50 transition-colors">
+                  <td className="px-4 py-3 font-mono text-xs text-slate-500" title={r.id}>{r.id}</td>
                   <td className="px-4 py-3 text-slate-700">{r.space}</td>
                   <td className="px-4 py-3 text-slate-700">{r.userFullName ?? '—'}</td>
                   <td className="px-4 py-3 text-slate-700">{r.date}</td>
