@@ -33,7 +33,8 @@ export default function ReservationsPage() {
     if (!user) return
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void load()
-  }, [user, load])
+    // user is reparsed from localStorage each render (new ref), so depend on its id
+  }, [user?.id, load])
 
   async function handleCancel(r: Reservation) {
     if (!confirm('¿Cancelar esta reserva?')) return
