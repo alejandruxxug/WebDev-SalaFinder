@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Button from '../components/ui/Button'
 import StateMessage from '../components/ui/StateMessage'
 import { fetchAllReservations, updateReservationStatus } from '../api/reservations'
-import { isAdmin } from '../utils/auth'
+import { isAdminOrStaff } from '../utils/auth'
 import type { Reservation } from '../types'
 
 export default function ApprovalsPage() {
@@ -22,7 +22,7 @@ export default function ApprovalsPage() {
   }, [])
 
   useEffect(() => {
-    if (!isAdmin()) {
+    if (!isAdminOrStaff()) {
       navigate('/')
       return
     }
@@ -49,7 +49,7 @@ export default function ApprovalsPage() {
     void load()
   }
 
-  if (!isAdmin()) return null
+  if (!isAdminOrStaff()) return null
 
   return (
     <main className="mx-auto max-w-4xl px-6 py-6">

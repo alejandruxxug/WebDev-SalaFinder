@@ -1,4 +1,4 @@
-import { apiGet, apiPost, type ApiResult } from './apiClient'
+import { apiGet, apiPatch, apiPost, type ApiResult } from './apiClient'
 import { getSessionUser, setSessionUser, patchSessionUser, type SessionUser } from '../utils/auth'
 import type { UserRole } from '../types'
 
@@ -92,8 +92,30 @@ export interface AdminUser {
   isBlocked: boolean
   blockedUntil?: string | null
   noShowCount: number
+  role: UserRole
 }
 
 export async function listUsers(): Promise<ApiResult<AdminUser[]>> {
   return apiGet<AdminUser[]>('/api/auth/users')
+}
+
+export async function changeUserRole(
+  id: string,
+  input: { newRole: UserRole; reason: string },
+): Promise<ApiResult<{ message: string }>> {
+  return apiPatch<{ message: string }>(`/api/auth/users/${id}/role`, input)
+}
+
+export async function lockUser(
+  id: string,
+  input: { blockedUntil: string; reason: string },
+): Promise<ApiResult<{ message: string }>> {
+  return apiPost<{ message: string }>(`/api/auth/users/${id}/lock`, input)
+}
+
+export async function unlockUser(
+  id: string,
+  input: { reason: string },
+): Promise<ApiResult<{ message: string }>> {
+  return apiPost<{ message: string }>(`/api/auth/users/${id}/unlock`, input)
 }

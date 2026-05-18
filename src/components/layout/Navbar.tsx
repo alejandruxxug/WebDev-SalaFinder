@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { FiLogIn, FiUserPlus, FiList, FiLogOut, FiCheckCircle, FiMenu, FiX } from 'react-icons/fi'
-import { isLoggedIn, logout, isAdmin, isAdminOrStaff } from '../../utils/auth'
+import { FiLogIn, FiUserPlus, FiList, FiLogOut, FiMenu, FiX } from 'react-icons/fi'
+import { isLoggedIn, logout } from '../../utils/auth'
 
 const linkBase = 'text-sm text-blue-200 hover:text-white hover:bg-[#002470] px-3 py-1.5 rounded transition-colors'
 const active = 'text-white bg-[#002470] font-semibold'
@@ -38,29 +38,6 @@ export default function Navbar() {
       <NavLink to="/reservations/new" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
         Nueva reserva
       </NavLink>
-      {loggedIn && isAdmin() && (
-        <NavLink to="/approvals" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-          <span className="inline-flex items-center gap-1.5">
-            <FiCheckCircle />
-            Aprobaciones
-          </span>
-        </NavLink>
-      )}
-      {loggedIn && isAdminOrStaff() && (
-        <NavLink to="/admin/reservations" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-          Todas las reservas
-        </NavLink>
-      )}
-      {loggedIn && isAdmin() && (
-        <>
-          <NavLink to="/admin/spaces" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-            Gestionar espacios
-          </NavLink>
-          <NavLink to="/admin/audit" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={closeMenu}>
-            Auditoría
-          </NavLink>
-        </>
-      )}
       {loggedIn ? (
         <button
           onClick={handleLogout}
