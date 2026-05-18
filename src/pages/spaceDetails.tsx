@@ -56,7 +56,7 @@ export default function SpaceDetails() {
           title="Espacio no encontrado"
           description={error ?? 'No se pudo cargar el espacio.'}
           actionText="Ir al inicio"
-          onAction={() => navigate('/')}
+          onAction={() => navigate('/home')}
         />
       </main>
     )
@@ -66,7 +66,7 @@ export default function SpaceDetails() {
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-6">
-      <Link to="/" className="inline-flex items-center gap-2 text-sm text-[#003087] hover:underline">
+      <Link to="/home" className="inline-flex items-center gap-2 text-sm text-[#003087] hover:underline">
         <SlArrowLeftCircle />
         Volver a espacios
       </Link>

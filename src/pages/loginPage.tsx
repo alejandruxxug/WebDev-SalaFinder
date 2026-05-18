@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { FiLogIn } from 'react-icons/fi'
+import { FiLogIn, FiEye, FiEyeOff } from 'react-icons/fi'
 import Button from '../components/ui/Button'
 import { login } from '../api/auth'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
   const navigate = useNavigate()
   const location = useLocation()
-  const from = (location.state as { from?: string })?.from ?? '/'
+  const from = (location.state as { from?: string })?.from ?? '/home'
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -62,14 +63,24 @@ export default function LoginPage() {
           </label>
           <label className="flex flex-col gap-2">
             <span className="text-xs font-medium text-slate-500">Contraseña</span>
-            <input
-              className="border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]"
-              type="password"
-              placeholder="••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <input
+                className="w-full border border-slate-300 bg-white px-3 py-2 pr-10 text-sm text-slate-800 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                className="absolute inset-y-0 right-2 flex items-center text-slate-500 hover:text-slate-700"
+              >
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
           </label>
           {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
           <Button type="submit" variant="primary" disabled={submitting}>

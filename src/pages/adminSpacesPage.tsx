@@ -74,7 +74,7 @@ export default function AdminSpacesPage() {
 
   useEffect(() => {
     if (!isAdmin()) {
-      navigate('/')
+      navigate('/home')
       return
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect

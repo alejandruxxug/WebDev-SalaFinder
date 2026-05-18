@@ -148,7 +148,7 @@ export default function CreateReservationPage() {
           title="No hay espacio seleccionado"
           description="Selecciona un espacio primero."
           actionText="Ver espacios"
-          onAction={() => navigate('/')}
+          onAction={() => navigate('/home')}
         />
       </main>
     )
@@ -157,7 +157,7 @@ export default function CreateReservationPage() {
   if (loadError) {
     return (
       <main className="mx-auto max-w-md px-4 py-10 sm:px-6">
-        <StateMessage type="error" title="No se pudo cargar el espacio" description={loadError} actionText="Volver" onAction={() => navigate('/')} />
+        <StateMessage type="error" title="No se pudo cargar el espacio" description={loadError} actionText="Volver" onAction={() => navigate('/home')} />
       </main>
     )
   }
@@ -178,7 +178,7 @@ export default function CreateReservationPage() {
           title="Cuenta bloqueada"
           description="No puedes crear reservas. Contacta al administrador."
           actionText="Volver"
-          onAction={() => navigate('/')}
+          onAction={() => navigate('/home')}
         />
       </main>
     )
@@ -283,7 +283,7 @@ export default function CreateReservationPage() {
             <Button type="submit" variant="primary" disabled={submitting}>
               {submitting ? 'Enviando...' : 'Crear reserva'}
             </Button>
-            <Button type="button" variant="secondary" onClick={() => navigate('/')}>
+            <Button type="button" variant="secondary" onClick={() => navigate('/home')}>
               Cancelar
             </Button>
           </div>

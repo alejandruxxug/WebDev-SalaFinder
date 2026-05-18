@@ -15,31 +15,42 @@ import AuditLogPage from './pages/auditLogPage'
 import CalendarPage from './pages/calendarPage'
 import LoginPage from './pages/loginPage'
 import SignUpPage from './pages/signUpPage'
+import LandingPage from './pages/landingPage'
 import NotFoundPage from './pages/notFoundPage'
 import { isAdminOrStaff, isLoggedIn } from './utils/auth'
 import { fetchMe } from './api/auth'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const location = useLocation()
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
+  const isPublicPage =
+    location.pathname === '/' ||
+    location.pathname === '/login' ||
+    location.pathname === '/signup'
 
-  if (isAuthPage) return <>{children}</>
-  if (!isLoggedIn()) return <Navigate to="/login" replace state={{ from: location.pathname }} />
+  if (isPublicPage) return <>{children}</>
+  if (!isLoggedIn()) return <Navigate to="/" replace state={{ from: location.pathname }} />
   return <>{children}</>
+}
+
+function RootRoute() {
+  return isLoggedIn() ? <Navigate to="/home" replace /> : <LandingPage />
 }
 
 function AppShell() {
   const location = useLocation()
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup'
-  const showSidebar = isLoggedIn() && isAdminOrStaff() && !isAuthPage
+  const isLandingPage = location.pathname === '/'
+  const hideChrome = isAuthPage || isLandingPage
+  const showSidebar = isLoggedIn() && isAdminOrStaff() && !hideChrome
 
   return (
     <>
-      {!isAuthPage && (showSidebar ? <AdminSidebar /> : <Navbar />)}
+      {!hideChrome && (showSidebar ? <AdminSidebar /> : <Navbar />)}
       <div className={showSidebar ? 'md:ml-60' : ''}>
-        {!isAuthPage && <BlockedBanner />}
+        {!hideChrome && <BlockedBanner />}
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<RootRoute />} />
+          <Route path="/home" element={<HomePage />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/spaces/:id" element={<SpaceDetails />} />
           <Route path="/reservations" element={<ReservationsPage />} />

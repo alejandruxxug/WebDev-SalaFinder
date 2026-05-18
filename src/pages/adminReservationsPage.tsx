@@ -42,7 +42,7 @@ export default function AdminReservationsPage() {
 
   useEffect(() => {
     if (!isAdminOrStaff()) {
-      navigate('/')
+      navigate('/home')
       return
     }
     // eslint-disable-next-line react-hooks/set-state-in-effect

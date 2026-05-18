@@ -38,7 +38,7 @@ export default function AdminSidebar() {
 
   const nav = (
     <>
-      <NavLink to="/" end className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={close}>
+      <NavLink to="/home" end className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={close}>
         <FiHome /> Espacios
       </NavLink>
       <NavLink to="/calendar" className={({ isActive }) => (isActive ? `${linkBase} ${active}` : linkBase)} onClick={close}>
@@ -82,7 +82,7 @@ export default function AdminSidebar() {
     <>
       {/* Mobile top bar */}
       <header className="md:hidden bg-[#003087] text-white flex items-center justify-between px-4 py-3 shadow-md">
-        <NavLink to="/" className="flex items-center gap-2.5" onClick={close}>
+        <NavLink to="/home" className="flex items-center gap-2.5" onClick={close}>
           <img src="/salaFinderLogo-200.png" alt="SalaFinder" className="h-8 w-8 rounded object-contain" />
           <div className="leading-tight">
             <p className="m-0 text-[10px] font-medium uppercase tracking-widest text-blue-200">EIA University</p>

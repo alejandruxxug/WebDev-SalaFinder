@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { FiUserPlus } from 'react-icons/fi'
+import { FiUserPlus, FiEye, FiEyeOff } from 'react-icons/fi'
 import Button from '../components/ui/Button'
 import { login, register } from '../api/auth'
 
@@ -10,6 +10,8 @@ export default function SignUpPage() {
   const [program, setProgram] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -57,7 +59,7 @@ export default function SignUpPage() {
       setError(session.error)
       return
     }
-    navigate('/')
+    navigate('/home')
   }
 
   const inputClass = 'border border-slate-300 bg-white px-3 py-2 text-sm text-slate-800 rounded focus:outline-none focus:ring-2 focus:ring-[#003087]/30 focus:border-[#003087]'
@@ -111,26 +113,46 @@ export default function SignUpPage() {
           </label>
           <label className="flex flex-col gap-2">
             <span className="text-xs font-medium text-slate-500">Contraseña</span>
-            <input
-              className={inputClass}
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-            />
+            <div className="relative">
+              <input
+                className={`${inputClass} w-full pr-10`}
+                type={showPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={8}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                className="absolute inset-y-0 right-2 flex items-center text-slate-500 hover:text-slate-700"
+              >
+                {showPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
           </label>
           <label className="flex flex-col gap-2">
             <span className="text-xs font-medium text-slate-500">Confirmar contraseña</span>
-            <input
-              className={inputClass}
-              type="password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-            />
+            <div className="relative">
+              <input
+                className={`${inputClass} w-full pr-10`}
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((v) => !v)}
+                aria-label={showConfirmPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                className="absolute inset-y-0 right-2 flex items-center text-slate-500 hover:text-slate-700"
+              >
+                {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
+            </div>
           </label>
           {error && <p className="text-sm text-red-600" role="alert">{error}</p>}
           <Button type="submit" variant="primary" disabled={submitting}>
